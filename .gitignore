@@ -99,3 +99,7 @@ Manager.exe
 *.env
 *.env.*
 standalone-electron/node_modules/electron/dist/electron
+-e 
+# Environment files
+*.env
+*.env.*
