@@ -183,27 +183,53 @@ function App() {
       const recipientEmail = pdf.emails[0];
 
       try {
-        const response = await axios.post(`${API}/outlook/draft`, {
-          pdf_filename: pdf.filename,
-          pdf_path: pdf.file_path,
-          recipient_email: recipientEmail,
-          subject: emailSubject,
-          body: emailBody
-        }, {
-          responseType: 'blob'
-        });
+        // Check if using uploaded files or folder path
+        if (uploadedFiles.length > 0) {
+          const file = uploadedFiles.find(f => f.name === pdfFilename);
+          if (file) {
+            const formData = new FormData();
+            formData.append('pdf_file', file);
+            formData.append('recipient_email', recipientEmail);
+            formData.append('subject', emailSubject);
+            formData.append('body', emailBody);
 
-        // Download the .eml file
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `draft_${pdf.filename.replace('.pdf', '')}.eml`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
+            const response = await axios.post(`${API}/outlook/draft-upload`, formData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              responseType: 'blob'
+            });
 
-        successCount++;
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `draft_${file.name.replace('.pdf', '')}.eml`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            successCount++;
+          }
+        } else {
+          // Use folder path method
+          const response = await axios.post(`${API}/outlook/draft`, {
+            pdf_filename: pdf.filename,
+            pdf_path: pdf.file_path,
+            recipient_email: recipientEmail,
+            subject: emailSubject,
+            body: emailBody
+          }, {
+            responseType: 'blob'
+          });
+
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', `draft_${pdf.filename.replace('.pdf', '')}.eml`);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+          successCount++;
+        }
       } catch (error) {
         console.error(`Error generating draft for ${pdfFilename}:`, error);
       }
