@@ -198,14 +198,26 @@ function App() {
               responseType: 'blob'
             });
 
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            // Create blob URL and open in new window to trigger Outlook
+            const blob = new Blob([response.data], { type: 'message/rfc822' });
+            const url = window.URL.createObjectURL(blob);
+            
+            // Try to open in new window first (will prompt Outlook)
+            const newWindow = window.open(url, '_blank');
+            
+            // Fallback: also create download link
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `draft_${file.name.replace('.pdf', '')}.eml`);
+            link.download = `draft_${file.name.replace('.pdf', '')}.eml`;
             document.body.appendChild(link);
             link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
+            
+            // Cleanup after a delay
+            setTimeout(() => {
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(url);
+            }, 1000);
+            
             successCount++;
           }
         } else {
@@ -220,23 +232,41 @@ function App() {
             responseType: 'blob'
           });
 
-          const url = window.URL.createObjectURL(new Blob([response.data]));
+          // Create blob URL and open in new window to trigger Outlook
+          const blob = new Blob([response.data], { type: 'message/rfc822' });
+          const url = window.URL.createObjectURL(blob);
+          
+          // Try to open in new window first (will prompt Outlook)
+          const newWindow = window.open(url, '_blank');
+          
+          // Fallback: also create download link
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', `draft_${pdf.filename.replace('.pdf', '')}.eml`);
+          link.download = `draft_${pdf.filename.replace('.pdf', '')}.eml`;
           document.body.appendChild(link);
           link.click();
-          link.remove();
-          window.URL.revokeObjectURL(url);
+          
+          // Cleanup after a delay
+          setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          }, 1000);
+          
           successCount++;
         }
       } catch (error) {
         console.error(`Error generating draft for ${pdfFilename}:`, error);
       }
+      
+      // Add small delay between drafts to prevent browser blocking
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     setLoading(false);
-    toast.success(`Generated ${successCount} draft email(s). Check your downloads folder.`);
+    toast.success(`Generated ${successCount} draft email(s). Opening in Outlook...`, {
+      duration: 5000,
+      description: "If Outlook doesn't open automatically, check your downloads folder."
+    });
   };
 
   return (
