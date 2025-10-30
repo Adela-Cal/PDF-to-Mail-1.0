@@ -112,6 +112,34 @@ The application will open automatically in your browser at `http://localhost:300
   - PDF attached
   - Subject and body filled in
 
+**Note:** Each PDF generates its own separate email with its own recipient and attachment.
+
+## Email Preview Feature
+
+The app shows a live preview of how each email will look:
+
+1. **Appears Automatically** - When you select PDFs and enter email content
+2. **Shows Email Headers** - From, To, Subject, and attachment info
+3. **Editable Preview** - Click inside the preview to edit the email body
+4. **Text Editing** - Select, copy, paste, and rearrange text as needed
+5. **Reset Button** - Restores the email body to the original template
+6. **What You Edit is What You Send** - The generated drafts use your edited preview content
+
+## Controlling Where Files Are Saved
+
+By default, .eml files download to your Windows Downloads folder (usually `C:\Users\YourName\Downloads`).
+
+**To change the download location:**
+
+1. In Chrome: Settings → Downloads → Change "Location"
+2. Or enable "Ask where to save each file before downloading"
+3. In Edge: Settings → Downloads → Change location
+
+**Or set it per-download:**
+- When the download starts, right-click the download at the bottom
+- Click "Show in folder" to see where it went
+- Or in browser settings, enable asking where to save each file
+
 ## Tips for Windows Users
 
 ### Making It Easier to Start
