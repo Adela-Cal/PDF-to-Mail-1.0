@@ -226,7 +226,7 @@ function App() {
       return;
     }
 
-    if (!emailSubject.trim() || !emailBody.trim()) {
+    if (!emailSubject.trim() || !emailPreview.trim()) {
       toast.error("Please enter email subject and body");
       return;
     }
@@ -238,6 +238,9 @@ function App() {
     const account = emailAccounts.find(a => a.id === selectedAccount);
     const senderEmail = account?.email || null;
     const senderName = account?.name || null;
+    
+    // Use the preview content (which may have been edited)
+    const finalEmailBody = emailPreview || emailBody;
 
     for (const pdfFilename of selectedPdfs) {
       const pdf = pdfs.find(p => p.filename === pdfFilename);
@@ -259,7 +262,7 @@ function App() {
             formData.append('pdf_file', file);
             formData.append('recipient_email', recipientEmail);
             formData.append('subject', emailSubject);
-            formData.append('body', emailBody);
+            formData.append('body', finalEmailBody);
             if (senderEmail) formData.append('sender_email', senderEmail);
             if (senderName) formData.append('sender_name', senderName);
 
@@ -277,7 +280,7 @@ function App() {
             sender_email: senderEmail,
             sender_name: senderName,
             subject: emailSubject,
-            body: emailBody
+            body: finalEmailBody
           }, {
             responseType: 'blob'
           });
