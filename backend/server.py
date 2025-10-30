@@ -87,6 +87,18 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         logging.error(f"Error extracting text from {pdf_path}: {e}")
         return ""
 
+# Utility function to extract text from PDF file object
+def extract_text_from_pdf_file(pdf_file: bytes) -> str:
+    try:
+        pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_file))
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+        return text
+    except Exception as e:
+        logging.error(f"Error extracting text from PDF file: {e}")
+        return ""
+
 
 # Template Routes
 @api_router.get("/templates", response_model=List[EmailTemplate])
