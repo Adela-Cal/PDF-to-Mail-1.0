@@ -86,7 +86,19 @@ function App() {
   };
 
   const handleFolderSelect = () => {
-    fileInputRef.current?.click();
+    // Check if running in Electron
+    if (window.electron && window.electron.selectFolder) {
+      // Use native folder picker in Electron
+      window.electron.selectFolder().then(folderPath => {
+        if (folderPath) {
+          setFolderPath(folderPath);
+          toast.success("Folder selected: " + folderPath);
+        }
+      });
+    } else {
+      // Fallback to file input for browser
+      fileInputRef.current?.click();
+    }
   };
 
   const handleFilesSelected = async (event) => {
