@@ -1,0 +1,62 @@
+{
+  "name": "pdf-email-manager-desktop",
+  "version": "1.0.0",
+  "description": "PDF Email Manager Desktop Application",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:portable": "electron-builder --win portable"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "tree-kill": "^1.2.2"
+  },
+  "build": {
+    "appId": "com.pdfemailmanager.app",
+    "productName": "PDF Email Manager",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-main.js",
+      "preload.js",
+      "icon.ico",
+      "backend/**/*",
+      "frontend/build/**/*",
+      "!backend/venv/**/*",
+      "!backend/__pycache__/**/*",
+      "!frontend/node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PDF Email Manager"
+    },
+    "portable": {
+      "artifactName": "PDFEmailManager-Portable.exe"
+    }
+  }
+}
