@@ -114,6 +114,36 @@ def extract_text_from_pdf_file(pdf_file: bytes) -> str:
         return ""
 
 
+# Email Account Routes
+@api_router.get("/email-accounts", response_model=List[EmailAccount])
+async def get_email_accounts():
+    accounts = await db.email_accounts.find({}, {"_id": 0}).to_list(1000)
+    
+    for account in accounts:
+        if isinstance(account['created_at'], str):
+            account['created_at'] = datetime.fromisoformat(account['created_at'])
+    
+    return accounts
+
+@api_router.post("/email-accounts", response_model=EmailAccount)
+async def create_email_account(input: EmailAccountCreate):
+    account_dict = input.model_dump()
+    account_obj = EmailAccount(**account_dict)
+    
+    doc = account_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    _ = await db.email_accounts.insert_one(doc)
+    return account_obj
+
+@api_router.delete("/email-accounts/{account_id}")
+async def delete_email_account(account_id: str):
+    result = await db.email_accounts.delete_one({"id": account_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Email account not found")
+    return {"message": "Email account deleted successfully"}
+
+
 # Template Routes
 @api_router.get("/templates", response_model=List[EmailTemplate])
 async def get_templates():
