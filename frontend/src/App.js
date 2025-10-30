@@ -35,9 +35,10 @@ function App() {
   const [newAccountEmail, setNewAccountEmail] = useState("");
   const [newAccountName, setNewAccountName] = useState("");
 
-  // Load templates on mount
+  // Load templates and email accounts on mount
   useEffect(() => {
     loadTemplates();
+    loadEmailAccounts();
   }, []);
 
   const loadTemplates = async () => {
@@ -46,6 +47,15 @@ function App() {
       setTemplates(response.data);
     } catch (error) {
       console.error("Error loading templates:", error);
+    }
+  };
+
+  const loadEmailAccounts = async () => {
+    try {
+      const response = await axios.get(`${API}/email-accounts`);
+      setEmailAccounts(response.data);
+    } catch (error) {
+      console.error("Error loading email accounts:", error);
     }
   };
 
