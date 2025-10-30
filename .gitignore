@@ -98,3 +98,4 @@ Manager.exe
 # Environment files
 *.env
 *.env.*
+standalone-electron/node_modules/electron/dist/electron
