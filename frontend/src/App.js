@@ -224,6 +224,11 @@ function App() {
 
     setLoading(true);
     let successCount = 0;
+    
+    // Get selected email account details
+    const account = emailAccounts.find(a => a.id === selectedAccount);
+    const senderEmail = account?.email || null;
+    const senderName = account?.name || null;
 
     for (const pdfFilename of selectedPdfs) {
       const pdf = pdfs.find(p => p.filename === pdfFilename);
@@ -235,6 +240,8 @@ function App() {
       const recipientEmail = pdf.emails[0];
 
       try {
+        let response;
+        
         // Check if using uploaded files or folder path
         if (uploadedFiles.length > 0) {
           const file = uploadedFiles.find(f => f.name === pdfFilename);
@@ -244,81 +251,67 @@ function App() {
             formData.append('recipient_email', recipientEmail);
             formData.append('subject', emailSubject);
             formData.append('body', emailBody);
+            if (senderEmail) formData.append('sender_email', senderEmail);
+            if (senderName) formData.append('sender_name', senderName);
 
-            const response = await axios.post(`${API}/outlook/draft-upload`, formData, {
+            response = await axios.post(`${API}/outlook/draft-upload`, formData, {
               headers: { 'Content-Type': 'multipart/form-data' },
               responseType: 'blob'
             });
-
-            // Create blob URL and open in new window to trigger Outlook
-            const blob = new Blob([response.data], { type: 'message/rfc822' });
-            const url = window.URL.createObjectURL(blob);
-            
-            // Try to open in new window first (will prompt Outlook)
-            const newWindow = window.open(url, '_blank');
-            
-            // Fallback: also create download link
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `draft_${file.name.replace('.pdf', '')}.eml`;
-            document.body.appendChild(link);
-            link.click();
-            
-            // Cleanup after a delay
-            setTimeout(() => {
-              document.body.removeChild(link);
-              window.URL.revokeObjectURL(url);
-            }, 1000);
-            
-            successCount++;
           }
         } else {
           // Use folder path method
-          const response = await axios.post(`${API}/outlook/draft`, {
+          response = await axios.post(`${API}/outlook/draft`, {
             pdf_filename: pdf.filename,
             pdf_path: pdf.file_path,
             recipient_email: recipientEmail,
+            sender_email: senderEmail,
+            sender_name: senderName,
             subject: emailSubject,
             body: emailBody
           }, {
             responseType: 'blob'
           });
+        }
 
-          // Create blob URL and open in new window to trigger Outlook
+        if (response) {
+          // Create a proper download link
           const blob = new Blob([response.data], { type: 'message/rfc822' });
           const url = window.URL.createObjectURL(blob);
-          
-          // Try to open in new window first (will prompt Outlook)
-          const newWindow = window.open(url, '_blank');
-          
-          // Fallback: also create download link
           const link = document.createElement('a');
           link.href = url;
-          link.download = `draft_${pdf.filename.replace('.pdf', '')}.eml`;
+          link.download = `draft_${pdfFilename.replace('.pdf', '')}.eml`;
+          link.style.display = 'none';
           document.body.appendChild(link);
           link.click();
           
-          // Cleanup after a delay
+          // Cleanup
           setTimeout(() => {
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
-          }, 1000);
+          }, 100);
           
           successCount++;
         }
       } catch (error) {
         console.error(`Error generating draft for ${pdfFilename}:`, error);
+        toast.error(`Failed to generate draft for ${pdfFilename}`);
       }
       
-      // Add small delay between drafts to prevent browser blocking
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Add delay between downloads
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
 
     setLoading(false);
-    toast.success(`Generated ${successCount} draft email(s). Opening in Outlook...`, {
-      duration: 5000,
-      description: "If Outlook doesn't open automatically, check your downloads folder."
-    });
+    
+    if (successCount > 0) {
+      toast.success(`Downloaded ${successCount} .eml file(s) to your Downloads folder`, {
+        duration: 6000,
+        description: "Double-click the .eml files to open them in Outlook as drafts."
+      });
+    } else {
+      toast.error("Failed to generate any draft emails");
+    }
   };
 
   return (
