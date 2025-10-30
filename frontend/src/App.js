@@ -801,6 +801,17 @@ function App() {
                         <strong>Note:</strong> .eml files will be saved with names like "draft_filename.eml". 
                         Double-click them to open in Outlook as draft emails.
                       </div>
+                      
+                      <div className="bg-amber-50 border border-amber-200 rounded p-3 mt-2">
+                        <p className="text-xs text-amber-800 font-medium mb-2">⚠️ Not seeing downloads?</p>
+                        <ul className="text-xs text-amber-700 space-y-1 ml-4 list-disc">
+                          <li>Check browser download bar at bottom of window</li>
+                          <li>Look in your Downloads folder manually</li>
+                          <li>Check if browser is blocking downloads - click the icon in address bar</li>
+                          <li>Try opening browser DevTools (F12) → Console tab to see errors</li>
+                          <li>Make sure pop-ups are not blocked for this site</li>
+                        </ul>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
