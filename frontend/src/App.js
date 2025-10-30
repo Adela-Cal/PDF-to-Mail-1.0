@@ -264,24 +264,63 @@ function App() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="folder-path">Folder Path</Label>
-                <Input
-                  id="folder-path"
-                  data-testid="folder-path-input"
-                  placeholder="e.g., /Users/john/Documents/PDFs"
-                  value={folderPath}
-                  onChange={(e) => setFolderPath(e.target.value)}
-                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500"
-                />
+                <Label htmlFor="folder-path">Option 1: Enter Folder Path</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="folder-path"
+                    data-testid="folder-path-input"
+                    placeholder="e.g., /Users/john/Documents/PDFs"
+                    value={folderPath}
+                    onChange={(e) => setFolderPath(e.target.value)}
+                    className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                  <Button
+                    data-testid="extract-emails-btn"
+                    onClick={handleExtractEmails}
+                    disabled={loading || !folderPath.trim()}
+                    className="bg-indigo-600 hover:bg-indigo-700 transition-colors whitespace-nowrap"
+                  >
+                    {loading ? "Extracting..." : "Extract"}
+                  </Button>
+                </div>
               </div>
-              <Button
-                data-testid="extract-emails-btn"
-                onClick={handleExtractEmails}
-                disabled={loading}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 transition-colors"
-              >
-                {loading ? "Extracting..." : "Extract Emails"}
-              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-slate-300" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-slate-500">Or</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Option 2: Browse and Select PDFs</Label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  multiple
+                  onChange={handleFilesSelected}
+                  style={{ display: 'none' }}
+                  data-testid="file-input"
+                />
+                <Button
+                  data-testid="browse-folder-btn"
+                  onClick={handleFolderSelect}
+                  disabled={loading}
+                  variant="outline"
+                  className="w-full border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-colors"
+                >
+                  <FolderOpen className="w-4 h-4 mr-2" />
+                  Browse & Select PDF Files
+                </Button>
+                {uploadedFiles.length > 0 && (
+                  <p className="text-sm text-slate-600">
+                    {uploadedFiles.length} file(s) selected
+                  </p>
+                )}
+              </div>
 
               {/* PDF List */}
               {pdfs.length > 0 && (
