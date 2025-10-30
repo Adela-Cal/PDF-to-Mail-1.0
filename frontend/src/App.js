@@ -753,6 +753,40 @@ function App() {
                     className="min-h-[200px] border-slate-300 font-mono text-sm"
                   />
                 </div>
+                
+                {/* Save Location Info */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-indigo-600" />
+                    Save Location for Draft Files
+                  </Label>
+                  <Card className="bg-slate-50 border-slate-200">
+                    <CardContent className="pt-4 space-y-3">
+                      <div className="space-y-2">
+                        <p className="text-sm text-slate-700">
+                          <strong>Default Location:</strong> Your browser's Downloads folder
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          Typically: <code className="bg-white px-2 py-1 rounded text-xs">C:\Users\YourName\Downloads</code>
+                        </p>
+                      </div>
+                      
+                      <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                        <p className="text-xs text-blue-800 font-medium mb-2">💡 To Change Download Location:</p>
+                        <ol className="text-xs text-blue-700 space-y-1 ml-4 list-decimal">
+                          <li>Open Chrome Settings → Downloads</li>
+                          <li>Change "Location" to your preferred folder</li>
+                          <li>Or enable "Ask where to save each file before downloading"</li>
+                        </ol>
+                      </div>
+                      
+                      <div className="text-xs text-slate-500">
+                        <strong>Note:</strong> .eml files will be saved with names like "draft_filename.eml". 
+                        Double-click them to open in Outlook as draft emails.
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </CardContent>
           </Card>
