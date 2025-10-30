@@ -179,8 +179,11 @@ async def delete_template(template_id: str):
 async def extract_emails_from_pdfs(request: ExtractRequest):
     folder_path = request.folder_path
     
+    # Normalize path for Windows
+    folder_path = folder_path.replace('\\\\', '\\').strip('"').strip("'")
+    
     if not os.path.exists(folder_path):
-        raise HTTPException(status_code=400, detail="Folder path does not exist")
+        raise HTTPException(status_code=400, detail=f"Folder path does not exist: {folder_path}")
     
     if not os.path.isdir(folder_path):
         raise HTTPException(status_code=400, detail="Path is not a directory")
@@ -188,7 +191,10 @@ async def extract_emails_from_pdfs(request: ExtractRequest):
     results = []
     
     # Get all PDF files in the folder
-    pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.pdf')]
+    try:
+        pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.pdf')]
+    except PermissionError:
+        raise HTTPException(status_code=403, detail="Permission denied to access folder")
     
     if not pdf_files:
         raise HTTPException(status_code=404, detail="No PDF files found in the specified folder")
