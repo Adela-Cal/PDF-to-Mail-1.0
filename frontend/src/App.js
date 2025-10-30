@@ -211,8 +211,14 @@ function App() {
       setSelectedTemplate(templateId);
       setEmailSubject(template.subject);
       setEmailBody(template.body);
+      setEmailPreview(template.body);
     }
   };
+
+  // Update preview when body changes
+  useEffect(() => {
+    setEmailPreview(emailBody);
+  }, [emailBody]);
 
   const handleGenerateDrafts = async () => {
     if (selectedPdfs.length === 0) {
