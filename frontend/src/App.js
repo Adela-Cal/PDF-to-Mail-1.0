@@ -55,9 +55,50 @@ function App() {
       });
       setPdfs(response.data);
       setSelectedPdfs([]);
+      setUploadedFiles([]);
       toast.success(`Extracted emails from ${response.data.length} PDF(s)`);
     } catch (error) {
       toast.error(error.response?.data?.detail || "Error extracting emails from PDFs");
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFolderSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFilesSelected = async (event) => {
+    const files = Array.from(event.target.files);
+    const pdfFiles = files.filter(file => file.name.toLowerCase().endsWith('.pdf'));
+    
+    if (pdfFiles.length === 0) {
+      toast.error("No PDF files selected");
+      return;
+    }
+
+    setLoading(true);
+    setUploadedFiles(pdfFiles);
+    
+    try {
+      const formData = new FormData();
+      pdfFiles.forEach((file) => {
+        formData.append('files', file);
+      });
+
+      const response = await axios.post(`${API}/pdf/upload-extract`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      setPdfs(response.data);
+      setSelectedPdfs([]);
+      setFolderPath("");
+      toast.success(`Extracted emails from ${response.data.length} PDF(s)`);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Error processing uploaded PDFs");
       console.error("Error:", error);
     } finally {
       setLoading(false);
