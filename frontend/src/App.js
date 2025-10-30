@@ -25,6 +25,8 @@ function App() {
   const [emailBody, setEmailBody] = useState("");
   const [loading, setLoading] = useState(false);
   const [showTemplateForm, setShowTemplateForm] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const fileInputRef = useRef(null);
 
   // Load templates on mount
   useEffect(() => {
