@@ -90,3 +90,7 @@ electron/node_modules/electron/dist/electron
 electron/dist/win-unpacked/PDF
 Email
 Manager.exe
+-e 
+# Environment files
+*.env
+*.env.*
