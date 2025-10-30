@@ -311,7 +311,9 @@ async def create_outlook_draft_from_upload(
     pdf_file: UploadFile = File(...),
     recipient_email: str = Form(...),
     subject: str = Form(...),
-    body: str = Form(...)
+    body: str = Form(...),
+    sender_email: str = Form(None),
+    sender_name: str = Form(None)
 ):
     try:
         # Create the email message
@@ -319,17 +321,24 @@ async def create_outlook_draft_from_upload(
         msg['To'] = recipient_email
         msg['Subject'] = subject
         
-        # Add body
+        # Add From field if sender email provided
+        if sender_email:
+            if sender_name:
+                msg['From'] = f'"{sender_name}" <{sender_email}>'
+            else:
+                msg['From'] = sender_email
+        
+        # Add body as HTML
         msg.attach(MIMEText(body, 'html'))
         
         # Read and attach PDF file
         pdf_content = await pdf_file.read()
-        part = MIMEBase('application', 'octet-stream')
+        part = MIMEBase('application', 'pdf')
         part.set_payload(pdf_content)
         encoders.encode_base64(part)
         part.add_header(
             'Content-Disposition',
-            f'attachment; filename= {pdf_file.filename}'
+            f'attachment; filename={pdf_file.filename}'
         )
         msg.attach(part)
         
@@ -337,7 +346,7 @@ async def create_outlook_draft_from_upload(
         eml_filename = f"draft_{uuid.uuid4().hex[:8]}_{pdf_file.filename.replace('.pdf', '')}.eml"
         eml_path = os.path.join('/tmp', eml_filename)
         
-        with open(eml_path, 'w') as eml_file:
+        with open(eml_path, 'w', encoding='utf-8') as eml_file:
             eml_file.write(msg.as_string())
         
         # Return file for download
@@ -345,7 +354,10 @@ async def create_outlook_draft_from_upload(
             eml_path,
             media_type='message/rfc822',
             filename=eml_filename,
-            headers={"Content-Disposition": f"attachment; filename={eml_filename}"}
+            headers={
+                "Content-Disposition": f"attachment; filename={eml_filename}",
+                "Content-Type": "message/rfc822"
+            }
         )
         
     except Exception as e:
