@@ -468,7 +468,7 @@ function App() {
               {pdfs.length > 0 && selectedPdfs.length > 0 && emailPreview && (
                 <div className="mt-6 space-y-3" data-testid="email-preview-section">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-lg text-slate-800">Email Preview</h3>
+                    <h3 className="font-semibold text-lg text-slate-800">Email Preview (Template)</h3>
                     <Button
                       data-testid="reset-preview-btn"
                       variant="outline"
@@ -480,36 +480,44 @@ function App() {
                     </Button>
                   </div>
                   
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Note:</strong> Each of the {selectedPdfs.length} selected PDF(s) will generate a separate email with its own recipient and attachment.
+                      This preview shows the template that will be used for each email.
+                    </p>
+                  </div>
+                  
                   <Card className="border-2 border-indigo-200 bg-white">
                     <CardContent className="p-4">
                       <div className="space-y-3 mb-4 pb-3 border-b border-slate-200">
                         <div className="flex items-start gap-2">
-                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">From:</span>
+                          <span className="text-sm font-semibold text-slate-600 min-w-[80px]">From:</span>
                           <span className="text-sm text-slate-800">
                             {emailAccounts.find(a => a.id === selectedAccount)?.email || 'Your Email'}
                           </span>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">To:</span>
+                          <span className="text-sm font-semibold text-slate-600 min-w-[80px]">To:</span>
                           <span className="text-sm text-slate-800">
                             {pdfs.find(p => selectedPdfs.includes(p.filename))?.emails[0] || 'recipient@email.com'}
+                            {selectedPdfs.length > 1 && <span className="text-slate-500 ml-2">(Example - each PDF gets its own recipient)</span>}
                           </span>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">Subject:</span>
+                          <span className="text-sm font-semibold text-slate-600 min-w-[80px]">Subject:</span>
                           <span className="text-sm text-slate-800">{emailSubject || '(No subject)'}</span>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">Attached:</span>
+                          <span className="text-sm font-semibold text-slate-600 min-w-[80px]">Attachment:</span>
                           <span className="text-sm text-indigo-600">
-                            {selectedPdfs.length} PDF(s)
+                            1 PDF per email ({selectedPdfs.length} emails total)
                           </span>
                         </div>
                       </div>
                       
                       <div className="space-y-2">
                         <Label htmlFor="email-preview" className="text-sm text-slate-600">
-                          Email Body (Editable - Click to modify)
+                          Email Body Template (Editable - Click to modify)
                         </Label>
                         <div
                           id="email-preview"
