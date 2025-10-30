@@ -400,7 +400,29 @@ function App() {
               {/* PDF List */}
               {pdfs.length > 0 && (
                 <div className="mt-6 space-y-3" data-testid="pdf-list">
-                  <h3 className="font-semibold text-lg text-slate-800">Extracted PDFs ({pdfs.length})</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg text-slate-800">Extracted PDFs ({pdfs.length})</h3>
+                    <div className="flex gap-2">
+                      <Button
+                        data-testid="select-all-btn"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedPdfs(pdfs.map(p => p.filename))}
+                        className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
+                      >
+                        Select All
+                      </Button>
+                      <Button
+                        data-testid="deselect-all-btn"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedPdfs([])}
+                        className="text-slate-600 border-slate-300 hover:bg-slate-50"
+                      >
+                        Deselect All
+                      </Button>
+                    </div>
+                  </div>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {pdfs.map((pdf) => (
                       <div
