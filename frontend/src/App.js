@@ -122,6 +122,41 @@ function App() {
     }
   };
 
+  const handleSaveEmailAccount = async () => {
+    if (!newAccountEmail.trim() || !newAccountName.trim()) {
+      toast.error("Please fill in all account fields");
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/email-accounts`, {
+        email: newAccountEmail,
+        name: newAccountName
+      });
+      toast.success("Email account saved successfully");
+      setNewAccountEmail("");
+      setNewAccountName("");
+      setShowAccountForm(false);
+      loadEmailAccounts();
+    } catch (error) {
+      toast.error("Error saving email account");
+      console.error("Error:", error);
+    }
+  };
+
+  const handleDeleteEmailAccount = async (accountId) => {
+    try {
+      await axios.delete(`${API}/email-accounts/${accountId}`);
+      toast.success("Email account deleted");
+      loadEmailAccounts();
+      if (selectedAccount === accountId) {
+        setSelectedAccount("");
+      }
+    } catch (error) {
+      toast.error("Error deleting email account");
+    }
+  };
+
   const handlePdfSelection = (pdfFilename) => {
     setSelectedPdfs(prev => {
       if (prev.includes(pdfFilename)) {
