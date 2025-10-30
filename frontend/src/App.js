@@ -27,6 +27,13 @@ function App() {
   const [showTemplateForm, setShowTemplateForm] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const fileInputRef = useRef(null);
+  
+  // Email account management
+  const [emailAccounts, setEmailAccounts] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState("");
+  const [showAccountForm, setShowAccountForm] = useState(false);
+  const [newAccountEmail, setNewAccountEmail] = useState("");
+  const [newAccountName, setNewAccountName] = useState("");
 
   // Load templates on mount
   useEffect(() => {
