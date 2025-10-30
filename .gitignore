@@ -87,3 +87,6 @@ electron/node_modules/electron/dist/electron
 # Environment files
 *.env
 *.env.*
+electron/dist/win-unpacked/PDF
+Email
+Manager.exe
