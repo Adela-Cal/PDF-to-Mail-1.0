@@ -286,43 +286,60 @@ function App() {
           });
         }
 
-        if (response) {
-          // Create a proper download link
-          const blob = new Blob([response.data], { type: 'message/rfc822' });
+        if (response && response.data) {
+          // Get filename from response headers or create one
+          const contentDisposition = response.headers['content-disposition'];
+          let filename = `draft_${pdfFilename.replace('.pdf', '')}.eml`;
+          
+          if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (filenameMatch && filenameMatch[1]) {
+              filename = filenameMatch[1].replace(/['"]/g, '');
+            }
+          }
+          
+          // Create blob with correct MIME type
+          const blob = new Blob([response.data], { 
+            type: 'message/rfc822'
+          });
+          
+          // Create download link with better browser compatibility
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `draft_${pdfFilename.replace('.pdf', '')}.eml`;
-          link.style.display = 'none';
+          link.download = filename;
+          
+          // Force download by appending to body and clicking
           document.body.appendChild(link);
           link.click();
           
-          // Cleanup
+          // Cleanup after a short delay
           setTimeout(() => {
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
-          }, 100);
+          }, 250);
           
           successCount++;
+          console.log(`Successfully downloaded: ${filename}`);
         }
       } catch (error) {
         console.error(`Error generating draft for ${pdfFilename}:`, error);
         toast.error(`Failed to generate draft for ${pdfFilename}`);
       }
       
-      // Add delay between downloads
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Add delay between downloads to ensure browser processes each one
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     setLoading(false);
     
     if (successCount > 0) {
-      toast.success(`Downloaded ${successCount} .eml file(s) to your Downloads folder`, {
-        duration: 6000,
-        description: "Double-click the .eml files to open them in Outlook as drafts."
+      toast.success(`Generated ${successCount} draft email(s)!`, {
+        duration: 8000,
+        description: `Check your Downloads folder for .eml files. If you don't see them, check your browser's download settings or try allowing downloads for this site.`
       });
     } else {
-      toast.error("Failed to generate any draft emails");
+      toast.error("Failed to generate any draft emails. Please check console for errors.");
     }
   };
 
