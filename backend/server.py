@@ -74,6 +74,8 @@ class DraftEmailRequest(BaseModel):
     pdf_filename: str
     pdf_path: str
     recipient_email: str
+    sender_email: Optional[str] = None
+    sender_name: Optional[str] = None
     subject: str
     body: str
 
