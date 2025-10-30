@@ -460,6 +460,77 @@ function App() {
                   </div>
                 </div>
               )}
+              
+              {/* Email Preview Section */}
+              {pdfs.length > 0 && selectedPdfs.length > 0 && emailPreview && (
+                <div className="mt-6 space-y-3" data-testid="email-preview-section">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg text-slate-800">Email Preview</h3>
+                    <Button
+                      data-testid="reset-preview-btn"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEmailPreview(emailBody)}
+                      className="text-slate-600 border-slate-300 hover:bg-slate-50"
+                    >
+                      Reset to Original
+                    </Button>
+                  </div>
+                  
+                  <Card className="border-2 border-indigo-200 bg-white">
+                    <CardContent className="p-4">
+                      <div className="space-y-3 mb-4 pb-3 border-b border-slate-200">
+                        <div className="flex items-start gap-2">
+                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">From:</span>
+                          <span className="text-sm text-slate-800">
+                            {emailAccounts.find(a => a.id === selectedAccount)?.email || 'Your Email'}
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">To:</span>
+                          <span className="text-sm text-slate-800">
+                            {pdfs.find(p => selectedPdfs.includes(p.filename))?.emails[0] || 'recipient@email.com'}
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">Subject:</span>
+                          <span className="text-sm text-slate-800">{emailSubject || '(No subject)'}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-sm font-semibold text-slate-600 min-w-[60px]">Attached:</span>
+                          <span className="text-sm text-indigo-600">
+                            {selectedPdfs.length} PDF(s)
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="email-preview" className="text-sm text-slate-600">
+                          Email Body (Editable - Click to modify)
+                        </Label>
+                        <div
+                          id="email-preview"
+                          data-testid="email-preview-editor"
+                          contentEditable
+                          suppressContentEditableWarning
+                          onBlur={(e) => setEmailPreview(e.currentTarget.innerHTML)}
+                          onInput={(e) => setEmailPreview(e.currentTarget.innerHTML)}
+                          className="min-h-[200px] p-4 border-2 border-slate-200 rounded-lg bg-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 overflow-auto"
+                          style={{ 
+                            fontFamily: 'Arial, sans-serif',
+                            fontSize: '14px',
+                            lineHeight: '1.6'
+                          }}
+                          dangerouslySetInnerHTML={{ __html: emailPreview }}
+                        />
+                        <p className="text-xs text-slate-500">
+                          💡 Tip: Click inside the preview to edit text, select and drag to rearrange content
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </CardContent>
           </Card>
 
