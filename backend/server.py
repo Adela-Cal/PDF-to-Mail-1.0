@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,9 +7,16 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
+import PyPDF2
+import re
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+import base64
 
 
 ROOT_DIR = Path(__file__).parent
@@ -27,44 +35,173 @@ api_router = APIRouter(prefix="/api")
 
 
 # Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+class EmailTemplate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    name: str
+    subject: str
+    body: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class EmailTemplateCreate(BaseModel):
+    name: str
+    subject: str
+    body: str
 
-# Add your routes to the router instead of directly to app
+class PDFExtraction(BaseModel):
+    filename: str
+    emails: List[str]
+    file_path: str
+
+class ExtractRequest(BaseModel):
+    folder_path: str
+
+class DraftEmailRequest(BaseModel):
+    pdf_filename: str
+    pdf_path: str
+    recipient_email: str
+    subject: str
+    body: str
+
+
+# Utility function to extract emails from text
+def extract_emails_from_text(text: str) -> List[str]:
+    # Comprehensive email regex pattern
+    email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    emails = re.findall(email_pattern, text)
+    # Remove duplicates and return
+    return list(set(emails))
+
+# Utility function to extract text from PDF
+def extract_text_from_pdf(pdf_path: str) -> str:
+    try:
+        with open(pdf_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+            return text
+    except Exception as e:
+        logging.error(f"Error extracting text from {pdf_path}: {e}")
+        return ""
+
+
+# Template Routes
+@api_router.get("/templates", response_model=List[EmailTemplate])
+async def get_templates():
+    templates = await db.email_templates.find({}, {"_id": 0}).to_list(1000)
+    
+    for template in templates:
+        if isinstance(template['created_at'], str):
+            template['created_at'] = datetime.fromisoformat(template['created_at'])
+    
+    return templates
+
+@api_router.post("/templates", response_model=EmailTemplate)
+async def create_template(input: EmailTemplateCreate):
+    template_dict = input.model_dump()
+    template_obj = EmailTemplate(**template_dict)
+    
+    doc = template_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    _ = await db.email_templates.insert_one(doc)
+    return template_obj
+
+@api_router.delete("/templates/{template_id}")
+async def delete_template(template_id: str):
+    result = await db.email_templates.delete_one({"id": template_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Template not found")
+    return {"message": "Template deleted successfully"}
+
+
+# PDF Extraction Route
+@api_router.post("/pdf/extract", response_model=List[PDFExtraction])
+async def extract_emails_from_pdfs(request: ExtractRequest):
+    folder_path = request.folder_path
+    
+    if not os.path.exists(folder_path):
+        raise HTTPException(status_code=400, detail="Folder path does not exist")
+    
+    if not os.path.isdir(folder_path):
+        raise HTTPException(status_code=400, detail="Path is not a directory")
+    
+    results = []
+    
+    # Get all PDF files in the folder
+    pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.pdf')]
+    
+    if not pdf_files:
+        raise HTTPException(status_code=404, detail="No PDF files found in the specified folder")
+    
+    for pdf_file in pdf_files:
+        file_path = os.path.join(folder_path, pdf_file)
+        
+        # Extract text from PDF
+        text = extract_text_from_pdf(file_path)
+        
+        # Extract emails from text
+        emails = extract_emails_from_text(text)
+        
+        results.append(PDFExtraction(
+            filename=pdf_file,
+            emails=emails,
+            file_path=file_path
+        ))
+    
+    return results
+
+
+# Outlook Draft Generation Route
+@api_router.post("/outlook/draft")
+async def create_outlook_draft(request: DraftEmailRequest):
+    try:
+        # Create the email message
+        msg = MIMEMultipart()
+        msg['To'] = request.recipient_email
+        msg['Subject'] = request.subject
+        
+        # Add body
+        msg.attach(MIMEText(request.body, 'html'))
+        
+        # Attach PDF file
+        if os.path.exists(request.pdf_path):
+            with open(request.pdf_path, 'rb') as attachment:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(attachment.read())
+                encoders.encode_base64(part)
+                part.add_header(
+                    'Content-Disposition',
+                    f'attachment; filename= {request.pdf_filename}'
+                )
+                msg.attach(part)
+        
+        # Save as .eml file
+        eml_filename = f"draft_{uuid.uuid4().hex[:8]}_{request.pdf_filename.replace('.pdf', '')}.eml"
+        eml_path = os.path.join('/tmp', eml_filename)
+        
+        with open(eml_path, 'w') as eml_file:
+            eml_file.write(msg.as_string())
+        
+        # Return file for download
+        return FileResponse(
+            eml_path,
+            media_type='message/rfc822',
+            filename=eml_filename,
+            headers={"Content-Disposition": f"attachment; filename={eml_filename}"}
+        )
+        
+    except Exception as e:
+        logging.error(f"Error creating draft: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "PDF Email Extractor API"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
 
 # Include the router in the main app
 app.include_router(api_router)
