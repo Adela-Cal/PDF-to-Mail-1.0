@@ -34,6 +34,9 @@ function App() {
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [newAccountEmail, setNewAccountEmail] = useState("");
   const [newAccountName, setNewAccountName] = useState("");
+  
+  // Email preview
+  const [emailPreview, setEmailPreview] = useState("");
 
   // Load templates and email accounts on mount
   useEffect(() => {
