@@ -167,6 +167,44 @@ async def extract_emails_from_pdfs(request: ExtractRequest):
     return results
 
 
+# PDF Upload and Extract Route
+@api_router.post("/pdf/upload-extract", response_model=List[PDFExtraction])
+async def upload_and_extract_emails(files: List[UploadFile] = File(...)):
+    if not files:
+        raise HTTPException(status_code=400, detail="No files uploaded")
+    
+    results = []
+    
+    for file in files:
+        if not file.filename.lower().endswith('.pdf'):
+            continue
+        
+        # Read file content
+        content = await file.read()
+        
+        # Extract text from PDF
+        text = extract_text_from_pdf_file(content)
+        
+        # Extract emails from text
+        emails = extract_emails_from_text(text)
+        
+        # Save temporarily for later use
+        temp_path = f"/tmp/{uuid.uuid4().hex}_{file.filename}"
+        with open(temp_path, 'wb') as f:
+            f.write(content)
+        
+        results.append(PDFExtraction(
+            filename=file.filename,
+            emails=emails,
+            file_path=temp_path
+        ))
+    
+    if not results:
+        raise HTTPException(status_code=400, detail="No valid PDF files uploaded")
+    
+    return results
+
+
 # Outlook Draft Generation Route
 @api_router.post("/outlook/draft")
 async def create_outlook_draft(request: DraftEmailRequest):
