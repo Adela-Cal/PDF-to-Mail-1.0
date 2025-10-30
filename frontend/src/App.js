@@ -442,6 +442,100 @@ function App() {
               <CardDescription>Create or select a template for your email drafts</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Email Account Selector */}
+              <div className="space-y-2 pb-4 border-b border-slate-200">
+                <Label>Your Email Account (Sender)</Label>
+                <div className="flex gap-2">
+                  <Select value={selectedAccount} onValueChange={setSelectedAccount}>
+                    <SelectTrigger data-testid="account-select" className="border-slate-300">
+                      <SelectValue placeholder="Select your email account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {emailAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          {account.name} ({account.email})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    data-testid="new-account-btn"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowAccountForm(!showAccountForm)}
+                    className="border-indigo-600 text-indigo-600 hover:bg-indigo-50"
+                  >
+                    <User className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Account Form */}
+              {showAccountForm && (
+                <Card className="bg-slate-50 border-slate-200" data-testid="account-form">
+                  <CardContent className="pt-6 space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="account-email">Your Email Address</Label>
+                      <Input
+                        id="account-email"
+                        data-testid="account-email-input"
+                        type="email"
+                        placeholder="john@company.com"
+                        value={newAccountEmail}
+                        onChange={(e) => setNewAccountEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="account-name">Display Name</Label>
+                      <Input
+                        id="account-name"
+                        data-testid="account-name-input"
+                        placeholder="John Doe"
+                        value={newAccountName}
+                        onChange={(e) => setNewAccountName(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      data-testid="save-account-btn"
+                      onClick={handleSaveEmailAccount}
+                      className="w-full bg-green-600 hover:bg-green-700"
+                    >
+                      Save Email Account
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Email Account Management */}
+              {emailAccounts.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Saved Email Accounts</Label>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {emailAccounts.map((account) => (
+                      <div
+                        key={account.id}
+                        data-testid={`saved-account-${account.email}`}
+                        className="flex items-center justify-between p-2 bg-slate-50 rounded border border-slate-200"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-slate-700">{account.name}</span>
+                          <span className="text-xs text-slate-500">{account.email}</span>
+                        </div>
+                        <Button
+                          data-testid={`delete-account-${account.email}`}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteEmailAccount(account.id)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Template Selector */}
               <div className="space-y-2">
                 <Label>Select Template</Label>
