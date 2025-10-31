@@ -49,7 +49,7 @@ if errorlevel 1 (
 
 echo.
 echo Building backend executable (this may take 3-5 minutes)...
-pyinstaller server_standalone.spec
+python -m PyInstaller server_standalone.spec
 if errorlevel 1 (
     echo.
     echo ERROR: Backend build failed
