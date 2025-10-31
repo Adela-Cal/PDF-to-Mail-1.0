@@ -49,7 +49,7 @@ REM Install Node dependencies
 echo.
 echo [4/5] Installing Node.js dependencies...
 cd /d %~dp0frontend
-call npm install
+call npm install --legacy-peer-deps
 if errorlevel 1 (
     echo ERROR: Failed to install Node.js dependencies
     pause
