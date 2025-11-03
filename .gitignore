@@ -116,3 +116,7 @@ standalone-electron/node_modules/electron/dist/electron
 *.env
 *.env.*
 standalone-build/node_modules/electron/dist/electron
+-e 
+# Environment files
+*.env
+*.env.*
