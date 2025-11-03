@@ -15,8 +15,6 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
 
 # Get backend URL from frontend .env file
 def get_backend_url():
