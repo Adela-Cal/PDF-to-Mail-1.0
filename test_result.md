@@ -101,3 +101,87 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "The application processes PDFs from folders, extracts email addresses, and generates individual Outlook draft emails (.eml files) for each PDF. The critical issue is that generated .eml files open as READ-ONLY messages in Outlook and cannot be edited or saved as drafts. Users need these files to open as editable drafts in Outlook so they can modify content and send emails."
+
+backend:
+  - task: "Generate Outlook drafts as editable .eml files"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported .eml files open as read-only in Outlook, cannot edit or save to drafts folder"
+      - working: true
+        agent: "main"
+        comment: "Added X-Unsent and X-UnsentDraft headers to both /outlook/draft and /outlook/draft-upload endpoints. These headers tell Outlook to treat the .eml files as unsent drafts rather than read-only messages."
+
+  - task: "Extract emails from PDFs in folder"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Core functionality for PDF email extraction exists, needs testing if issues arise"
+
+  - task: "Email template management"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "CRUD operations for email templates exist, needs testing if issues arise"
+
+  - task: "Email account management"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "CRUD operations for email accounts exist, needs testing if issues arise"
+
+frontend:
+  - task: "Email draft generation UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "UI for generating drafts exists, needs testing if issues arise"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Generate Outlook drafts as editable .eml files"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Fixed the critical Outlook draft issue by adding X-Unsent and X-UnsentDraft headers to the .eml file generation. These headers instruct Outlook to open the files as editable drafts instead of read-only messages. Modified both /api/outlook/draft and /api/outlook/draft-upload endpoints. Ready for backend testing to verify the fix works correctly."
