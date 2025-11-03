@@ -20,8 +20,8 @@
     "tree-kill": "^1.2.2"
   },
   "build": {
-    "appId": "com.pdfemailmanager.app",
-    "productName": "PDF Email Manager",
+    "appId": "com.speedystatements.app",
+    "productName": "Speedy Statements",
     "directories": {
       "output": "dist"
     },
