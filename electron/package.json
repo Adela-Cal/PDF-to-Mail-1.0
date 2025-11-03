@@ -53,7 +53,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "PDF Email Manager"
+      "shortcutName": "Speedy Statements"
     },
     "portable": {
       "artifactName": "PDFEmailManager-Portable.exe"
