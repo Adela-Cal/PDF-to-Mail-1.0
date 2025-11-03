@@ -380,7 +380,7 @@ async def create_outlook_draft_from_upload(
 
 @api_router.get("/")
 async def root():
-    return {"message": "PDF Email Extractor API"}
+    return {"message": "Speedy Statements API"}
 
 
 # Include the router in the main app
