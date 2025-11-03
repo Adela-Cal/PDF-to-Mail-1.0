@@ -1,7 +1,7 @@
 {
-  "name": "pdf-email-manager-desktop",
+  "name": "speedy-statements",
   "version": "1.0.0",
-  "description": "PDF Email Manager Desktop Application",
+  "description": "Speedy Statements - Desktop Application",
   "main": "electron-main.js",
   "scripts": {
     "start": "electron .",
