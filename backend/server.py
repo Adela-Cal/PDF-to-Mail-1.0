@@ -271,6 +271,10 @@ async def create_outlook_draft(request: DraftEmailRequest):
             else:
                 msg['From'] = request.sender_email
         
+        # Add draft-specific headers for Outlook
+        msg['X-Unsent'] = '1'
+        msg['X-UnsentDraft'] = '1'
+        
         # Add body as HTML
         msg.attach(MIMEText(request.body, 'html'))
         
