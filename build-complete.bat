@@ -21,6 +21,10 @@ echo.
 
 echo [2/5] Building frontend...
 cd frontend
+
+REM Copy production environment file
+copy /Y ..\standalone-build\.env.production .env.production >nul
+
 call yarn install
 if errorlevel 1 (
     echo ERROR: Frontend dependency installation failed
