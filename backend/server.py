@@ -338,6 +338,10 @@ async def create_outlook_draft_from_upload(
             else:
                 msg['From'] = sender_email
         
+        # Add draft-specific headers for Outlook
+        msg['X-Unsent'] = '1'
+        msg['X-UnsentDraft'] = '1'
+        
         # Add body as HTML
         msg.attach(MIMEText(body, 'html'))
         
