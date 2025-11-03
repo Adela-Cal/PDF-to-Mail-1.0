@@ -1,0 +1,104 @@
+============================================
+    SPEEDY STATEMENTS - QUICK SETUP
+    For: Adela-Cal/PDF-to-Mail-1.0
+============================================
+
+STEP 1: Open Command Prompt as Admin
+-------------------------------------
+Windows Key → type "cmd" 
+→ RIGHT-CLICK "Command Prompt" 
+→ "Run as administrator"
+
+
+STEP 2: Copy These Commands ONE AT A TIME
+------------------------------------------
+
+Command 1:
+┌────────────────────────────────────────┐
+│ cd C:\Program Files                    │
+└────────────────────────────────────────┘
+Press Enter ✓
+
+
+Command 2:
+┌────────────────────────────────────────┐
+│ git clone https://github.com/         │
+│ Adela-Cal/PDF-to-Mail-1.0.git         │
+└────────────────────────────────────────┘
+Press Enter ✓
+(Wait 2-5 minutes for download)
+
+
+Command 3:
+┌────────────────────────────────────────┐
+│ cd PDF-to-Mail-1.0                     │
+└────────────────────────────────────────┘
+Press Enter ✓
+
+
+Command 4:
+┌────────────────────────────────────────┐
+│ SETUP_AND_BUILD.bat                    │
+└────────────────────────────────────────┘
+Press Enter ✓
+(Wait 15-20 minutes)
+
+
+STEP 3: Get Your Installer
+---------------------------
+After build completes, find it at:
+
+C:\Program Files\
+  └── PDF-to-Mail-1.0\
+      └── standalone-build\
+          └── dist\
+              └── Speedy Statements Setup 1.0.0.exe
+                  ↑↑↑ THIS IS YOUR INSTALLER!
+
+
+STEP 4: Install
+---------------
+1. Double-click: Speedy Statements Setup 1.0.0.exe
+2. Follow wizard
+3. Launch from Desktop
+4. Done! ✓
+
+
+TROUBLESHOOTING
+---------------
+"git is not recognized"
+→ Install Git: https://git-scm.com/
+
+"python is not recognized"
+→ Install Python: https://python.org
+→ CHECK "Add to PATH"
+
+"Access is denied"
+→ Run Command Prompt as Administrator
+
+"Already exists"
+→ Skip Command 2, just do:
+  cd PDF-to-Mail-1.0
+  SETUP_AND_BUILD.bat
+
+
+BEFORE YOU START - VERIFY:
+---------------------------
+Open Command Prompt and check:
+
+python --version  → Should work ✓
+node --version    → Should work ✓
+git --version     → Should work ✓
+
+If any say "not recognized", install it first!
+
+
+TOTAL TIME: ~25 minutes
+- Download: 2-5 min
+- Build: 15-20 min
+- Install: 2 min
+
+
+============================================
+Questions? Tell me what error you see!
+============================================
