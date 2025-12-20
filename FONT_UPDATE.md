@@ -1,75 +1,60 @@
-# Font Update - Electric Boots Applied
+# Font Update - Electric Boots with Speed Lines
 
 ## What Was Changed
 
-✅ **Title Font Updated**: "Speedy Statements" now uses the **Electric Boots** font
-- Bold, geometric, speed-themed appearance
-- Uppercase letters
-- Increased letter spacing for impact
-- Larger size (text-6xl instead of text-5xl)
+✅ **Title Font Updated**: "SPEEDY STATEMENTS" now features:
+- **Electric Boots** font (bold, geometric, speed-themed)
+- **Speed lines effect** - horizontal stripes on left and right sides
+- Uppercase letters for maximum impact
+- Increased letter spacing
+- Larger size (text-6xl)
+
+## Visual Effect
+
+The title now displays with:
+- Bold, geometric letterforms (Electric Boots font)
+- **Speed lines** on the left side (progressively getting longer)
+- **Speed lines** on the right side (progressively getting shorter)
+- Creates a motion/speed effect
+- Matches the dynamic style shown in your reference image
 
 ## Files Modified
 
 ### 1. `/app/frontend/public/index.html`
-Added font-face declaration to load Electric Boots font from CDN:
-```css
-@font-face {
-    font-family: 'Electric Boots';
-    src: url('https://fonts.cdnfonts.com/s/95869/ElectricBoots.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-```
+Added font-face declaration to load Electric Boots font from CDN
 
-### 2. `/app/frontend/src/App.js`
-Updated the main title styling:
+### 2. `/app/frontend/src/App.css`
+Added custom CSS class `.speed-title` with pseudo-elements (::before and ::after) to create horizontal speed lines using gradient stripes
+
+### 3. `/app/frontend/src/App.js`
+Updated the main title to use the new class and styling:
 ```jsx
-<h1 className="text-6xl font-bold text-slate-800 mb-3" style={{ 
-  fontFamily: "'Electric Boots', 'Impact', sans-serif",
-  letterSpacing: '0.05em',
-  textTransform: 'uppercase',
-  fontWeight: '900'
-}}>
-  Speedy Statements
+<h1 className="speed-title text-6xl font-bold text-slate-800 mb-3">
+  SPEEDY STATEMENTS
 </h1>
 ```
 
-## Features
+## Speed Lines Effect
 
-- **Font Family**: Electric Boots (with Impact as fallback)
-- **Size**: Extra large (text-6xl)
-- **Style**: Bold, uppercase, extra-wide letter spacing
-- **Color**: Dark slate (text-slate-800)
+The speed lines are created using CSS gradients:
+- **Left side (::before)**: Horizontal bars getting progressively longer (motion coming from left)
+- **Right side (::after)**: Horizontal bars getting progressively shorter (motion going to right)
+- Color matches the text (dark slate #1e293b)
+- Positioned dynamically to work with any text size
 
 ## Automatic Application
 
-The font change will be included automatically when you build the standalone application:
+The font and speed lines effect will be included automatically when you build:
 - ✅ Development version (web) - already applied
-- ✅ Standalone build - will include the updated font
+- ✅ Standalone build - will include the updated design
 
 ## Next Build
 
-When you run `SETUP_AND_BUILD.bat` on Windows, the new font will be included in:
+When you run `SETUP_AND_BUILD.bat` on Windows, the new design will be included in:
 ```
 Speedy Statements Setup 1.0.0.exe
 ```
 
-No additional steps needed - just rebuild as normal!
-
-## Visual Style
-
-The Electric Boots font provides:
-- Bold, geometric letterforms
-- Modern, tech-forward appearance
-- Strong visual impact
-- Professional yet dynamic look
-- Similar to the speed-themed design you requested
-
-## Browser Compatibility
-
-The font loads from CDN with fallback to Impact font if Electric Boots fails to load, ensuring the title always displays with a bold, impactful style.
-
 ---
 
-**Status**: ✅ Complete and ready for next build!
+**Status**: ✅ Complete with speed lines effect!
