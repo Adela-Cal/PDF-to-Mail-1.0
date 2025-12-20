@@ -16,3 +16,81 @@ body {
 
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Speed Lines Effect for Title */
+.speed-title {
+  position: relative;
+  display: inline-block;
+}
+
+.speed-title::before {
+  content: '';
+  position: absolute;
+  left: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 10%,
+    #1e293b 10%,
+    #1e293b 15%,
+    transparent 15%,
+    transparent 20%,
+    #1e293b 20%,
+    #1e293b 27%,
+    transparent 27%,
+    transparent 32%,
+    #1e293b 32%,
+    #1e293b 41%,
+    transparent 41%,
+    transparent 45%,
+    #1e293b 45%,
+    #1e293b 57%,
+    transparent 57%,
+    transparent 60%,
+    #1e293b 60%,
+    #1e293b 75%,
+    transparent 75%,
+    transparent 78%,
+    #1e293b 78%,
+    #1e293b 100%
+  );
+}
+
+.speed-title::after {
+  content: '';
+  position: absolute;
+  right: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    #1e293b 0%,
+    #1e293b 22%,
+    transparent 22%,
+    transparent 25%,
+    #1e293b 25%,
+    #1e293b 43%,
+    transparent 43%,
+    transparent 45%,
+    #1e293b 45%,
+    #1e293b 59%,
+    transparent 59%,
+    transparent 68%,
+    #1e293b 68%,
+    #1e293b 73%,
+    transparent 73%,
+    transparent 80%,
+    #1e293b 80%,
+    #1e293b 85%,
+    transparent 85%,
+    transparent 90%,
+    #1e293b 90%,
+    #1e293b 100%
+  );
+}
