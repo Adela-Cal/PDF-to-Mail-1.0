@@ -360,7 +360,12 @@ function App() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-slate-800 mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-6xl font-bold text-slate-800 mb-3" style={{ 
+            fontFamily: "'Electric Boots', 'Impact', sans-serif",
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            fontWeight: '900'
+          }}>
             Speedy Statements
           </h1>
           <p className="text-lg text-slate-600" style={{ fontFamily: 'Inter, sans-serif' }}>
