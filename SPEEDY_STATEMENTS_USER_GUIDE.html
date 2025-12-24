@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedy Statements User Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .title-page {
+            text-align: center;
+            padding: 100px 0 80px;
+            border-bottom: 3px solid #2563eb;
+            margin-bottom: 60px;
+        }
+        
+        .main-title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            color: #2563eb;
+            font-size: 32px;
+            margin: 50px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2563eb;
+            page-break-after: avoid;
+        }
+        
+        h2 {
+            color: #475569;
+            font-size: 24px;
+            margin: 40px 0 15px;
+            page-break-after: avoid;
+        }
+        
+        h3 {
+            color: #64748b;
+            font-size: 20px;
+            margin: 30px 0 10px;
+            page-break-after: avoid;
+        }
+        
+        p {
+            margin: 15px 0;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .screenshot-placeholder {
+            background: #fef3c7;
+            border: 2px dashed #f59e0b;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 8px;
+            page-break-inside: avoid;
+        }
+        
+        .screenshot-title {
+            font-weight: bold;
+            color: #92400e;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .screenshot-instruction {
+            color: #b45309;
+            font-size: 14px;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .arrow-note {
+            color: #dc2626;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .tip-box {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .warning-box {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .success-box {
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #dc2626;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            overflow-x: auto;
+            page-break-inside: avoid;
+        }
+        
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .toc h2 {
+            color: #1e293b;
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .toc li {
+            margin: 10px 0;
+        }
+        
+        .toc a {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .checklist {
+            margin: 20px 0;
+        }
+        
+        .checklist li {
+            list-style: none;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #16a34a;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            page-break-inside: avoid;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f1f5f9;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            
+            .screenshot-placeholder, .tip-box, .warning-box, .success-box {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Title Page -->
+        <div class="title-page">
+            <div class="main-title">SPEEDY STATEMENTS</div>
+            <div class="subtitle">Professional PDF Email Management Software</div>
+            <div class="subtitle">User Guide</div>
+            <div class="version">Version 1.0.0 | For Windows 10/11</div>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#introduction">1. Introduction</a></li>
+                <li><a href="#getting-started">2. Getting Started - Preparing Your PDFs</a></li>
+                <li><a href="#launching">3. Launching Speedy Statements</a></li>
+                <li><a href="#importing">4. Importing PDF Files</a></li>
+                <li><a href="#templates">5. Managing Email Templates</a></li>
+                <li><a href="#accounts">6. Managing Email Accounts</a></li>
+                <li><a href="#generating">7. Generating Outlook Drafts</a></li>
+                <li><a href="#troubleshooting">8. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <!-- Introduction -->
+        <h1 id="introduction">Introduction</h1>
+        <p><strong>Speedy Statements</strong> is a desktop application designed to streamline your workflow by:</p>
+        <ul class="checklist">
+            <li>Extracting email addresses from PDF files</li>
+            <li>Managing reusable email templates</li>
+            <li>Creating Outlook-ready draft emails with PDF attachments</li>
+            <li>Saving time on repetitive email tasks</li>
+        </ul>
+        <p>This guide will walk you through every step of the process, from preparing your PDFs to sending draft emails.</p>
+
+        <!-- Getting Started -->
+        <h1 id="getting-started">Getting Started - Preparing Your PDFs</h1>
+        <p>Before using Speedy Statements, you need to extract the PDF files you want to process.</p>
+
+        <h2>Step 1: Open Adelaide Test Database</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Adelaide Test Database main window]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the location being opened</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Take a full-screen screenshot of the Adelaide Test Database<br>
+                • Show the navigation path clearly<br>
+                • Add arrow pointing to "Data" folder<br>
+                • Add arrow pointing to "AAWIN" folder<br>
+                • Add arrow pointing to "AAWIN Test"
+            </div>
+        </div>
+        <ol>
+            <li>Navigate to your Adelaide Test Database</li>
+            <li>Follow this path: <span class="code">Data → AAWIN → AAWIN Test</span></li>
+            <li>Open the AAWIN Test database</li>
+        </ol>
+
+        <h2>Step 2: Navigate to Client Summary Statements</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Area where client summary statements are located]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the menu/button to access statements</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Capture the interface showing where client statements are accessed<br>
+                • Add arrow pointing to the relevant menu item or section<br>
+                • Highlight any important navigation elements
+            </div>
+        </div>
+        <ol>
+            <li>Once in AAWIN Test, navigate to the area containing client summary statements</li>
+            <li>This is where you'll select which clients need statements</li>
+        </ol>
+
+        <h2>Step 3: Select and Export PDFs</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: PDF selection interface]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to selection checkboxes and export button</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the selection interface with some items selected<br>
+                • Add arrow pointing to checkboxes or selection method<br>
+                • Add arrow pointing to export/save button
+            </div>
+        </div>
+        <ol>
+            <li>Select the client summary statements you need</li>
+            <li>Export or save these as PDF files</li>
+            <li>Remember the export location - you'll need it in the next step</li>
+        </ol>
+
+        <h2>Step 4: Locate Your PDF Files</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Windows File Explorer showing the PDF location]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the folder path and PDF files</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Take screenshot of File Explorer window<br>
+                • Show the address bar with the path: C:\Data\AAWIN\Emails<br>
+                • Add arrow pointing to the address bar<br>
+                • Add arrow pointing to the PDF files visible in the folder<br>
+                • Highlight 2-3 PDF files as examples
+            </div>
+        </div>
+        <ol>
+            <li>Open <strong>Windows File Explorer</strong></li>
+            <li>Navigate to: <span class="code">C:\Data\AAWIN\Emails</span></li>
+            <li>You should see all the PDF files you just exported</li>
+        </ol>
+
+        <!-- Launching -->
+        <h1 id="launching">Launching Speedy Statements</h1>
+
+        <h2>Step 5: Open Speedy Statements</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Desktop with Speedy Statements shortcut]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the desktop icon</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Capture desktop showing the Speedy Statements icon<br>
+                • Add large arrow pointing to the icon<br>
+                • If icon has custom design, make it clearly visible
+            </div>
+        </div>
+        <ol>
+            <li>Locate the <strong>Speedy Statements</strong> icon on your Desktop</li>
+            <li>Double-click to launch the application</li>
+            <li>Wait 5-10 seconds for the application to load</li>
+        </ol>
+
+        <h2>Step 6: Main Application Window</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Speedy Statements main window upon first launch]</div>
+            <div class="arrow-note">Arrow indicators needed: Label the key areas of the interface</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Full application window screenshot<br>
+                • Add numbered arrows pointing to each major section:<br>
+                  1. Title area with SPEEDY STATEMENTS<br>
+                  2. PDF selection/import area<br>
+                  3. Template section<br>
+                  4. Account section<br>
+                  5. Preview panel
+            </div>
+        </div>
+        <p>Once launched, you'll see the main Speedy Statements interface with:</p>
+        <ul>
+            <li><strong>Title</strong>: SPEEDY STATEMENTS with speed-line effects</li>
+            <li><strong>PDF Selection Area</strong>: Where you'll import your files</li>
+            <li><strong>Email Template Section</strong>: For managing reusable templates</li>
+            <li><strong>Email Account Section</strong>: For selecting sender information</li>
+            <li><strong>Preview Panel</strong>: Shows how your email will look</li>
+        </ul>
+
+        <!-- Importing PDFs -->
+        <h1 id="importing">Importing PDF Files</h1>
+
+        <h2>Step 7: Select PDF Folder</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Browse Folder button]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the "Browse Folder" or folder selection button</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Close-up of the PDF import section<br>
+                • Add bright arrow pointing to the browse/select button<br>
+                • Make button clearly visible
+            </div>
+        </div>
+        <ol>
+            <li>Look for the <strong>"Browse Folder"</strong> or <strong>"Select Folder"</strong> button</li>
+            <li>Click this button</li>
+        </ol>
+
+        <h2>Step 8: Navigate to Your PDF Folder</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Windows folder selection dialog]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to navigation path and Select Folder button</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the folder selection dialog<br>
+                • Display the path in the address bar<br>
+                • Add arrow to the folder tree showing C:\Data\AAWIN\Emails selected<br>
+                • Add arrow to the "Select Folder" or "OK" button
+            </div>
+        </div>
+        <ol>
+            <li>A Windows folder browser will open</li>
+            <li>Navigate to: <span class="code">C:\Data\AAWIN\Emails</span></li>
+            <li>Click <strong>"Select Folder"</strong> or <strong>"OK"</strong></li>
+        </ol>
+
+        <h2>Step 9: View Extracted PDFs</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Application showing list of PDFs with extracted emails]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the PDF list, checkboxes, and extracted email addresses</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the full list of extracted PDFs<br>
+                • Add arrow pointing to filename column<br>
+                • Add arrow pointing to email address column<br>
+                • Add arrow pointing to a checkbox (checked)<br>
+                • Highlight at least 3 rows of data as examples
+            </div>
+        </div>
+        <p>After selecting the folder, Speedy Statements will:</p>
+        <ol>
+            <li>Automatically scan all PDF files</li>
+            <li>Extract email addresses from each PDF</li>
+            <li>Display them in a list with checkboxes</li>
+        </ol>
+        <p>You'll see:</p>
+        <ul>
+            <li><strong>PDF Filename</strong> in the first column</li>
+            <li><strong>Extracted Email Address</strong> in the second column</li>
+            <li><strong>Checkbox</strong> to select which ones to process</li>
+        </ul>
+
+        <h2>Step 10: Select PDFs for Processing</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: PDF list with some items selected and Select All/Deselect All buttons]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to Select All, Deselect All, and individual checkboxes</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the list with a mix of checked and unchecked items<br>
+                • Add arrow to "Select All" button<br>
+                • Add arrow to "Deselect All" button<br>
+                • Add arrow to one checked checkbox<br>
+                • Add arrow to one unchecked checkbox
+            </div>
+        </div>
+        <p>To select which PDFs to process:</p>
+        <ul>
+            <li><strong>Check individual boxes</strong>: Click the checkbox next to specific PDFs</li>
+            <li><strong>Select All</strong>: Click this button to select every PDF in the list</li>
+            <li><strong>Deselect All</strong>: Click this button to uncheck everything</li>
+        </ul>
+
+        <!-- Email Templates -->
+        <h1 id="templates">Managing Email Templates</h1>
+        <p>Email templates allow you to save and reuse common email content.</p>
+
+        <h2>Step 11: Create a New Template</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Email template section with empty fields]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to Template Name, Subject, and Body fields</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the template section clearly<br>
+                • Add arrow to "Template Name" field<br>
+                • Add arrow to "Subject" field<br>
+                • Add arrow to "Body" field (or email content area)<br>
+                • Leave fields empty to show the starting state
+            </div>
+        </div>
+        <ol>
+            <li>Locate the <strong>Email Template</strong> section</li>
+            <li>You'll see fields for:
+                <ul>
+                    <li><strong>Template Name</strong>: Give your template a memorable name</li>
+                    <li><strong>Subject</strong>: Email subject line</li>
+                    <li><strong>Body</strong>: Email message content</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2>Step 12: Enter Template Information</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Template fields filled with example content]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to each filled field and the Save button</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show all fields filled with the example content<br>
+                • Add arrow to each filled field<br>
+                • Add arrow pointing to the "Save Template" button<br>
+                • Highlight the button to make it obvious
+            </div>
+        </div>
+        <p>Example template:</p>
+        <ul>
+            <li><strong>Template Name</strong>: "Monthly Statement Email"</li>
+            <li><strong>Subject</strong>: "Your Monthly Statement - December 2025"</li>
+            <li><strong>Body</strong>:</li>
+        </ul>
+        <div class="code-block">Dear Client,
+
+Please find attached your monthly statement for your review.
+
+If you have any questions, please don't hesitate to contact us.
+
+Best regards,
+[Your Company Name]</div>
+
+        <h2>Step 13: Save Your Template</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Saved template appearing in dropdown or template list]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the saved template in the list/dropdown</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the template dropdown or list with the newly saved template<br>
+                • Add arrow pointing to the template name in the list<br>
+                • Show that it's now available for selection
+            </div>
+        </div>
+        <ol>
+            <li>Click the <strong>"Save Template"</strong> button</li>
+            <li>Your template is now saved and appears in the template selector</li>
+            <li>You can create multiple templates for different purposes</li>
+        </ol>
+
+        <h2>Step 14: Load an Existing Template</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Template dropdown menu expanded]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to dropdown arrow and template options</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the dropdown expanded with multiple template options<br>
+                • Add arrow to the dropdown button/arrow<br>
+                • Add arrow to one of the template names in the list<br>
+                • Show 2-3 template options if possible
+            </div>
+        </div>
+        <p>To use a saved template:</p>
+        <ol>
+            <li>Click the <strong>template dropdown menu</strong></li>
+            <li>Select the template you want to use</li>
+            <li>The subject and body fields will automatically populate</li>
+        </ol>
+
+        <!-- Email Accounts -->
+        <h1 id="accounts">Managing Email Accounts</h1>
+        <p>Email accounts let you specify who the email is "from".</p>
+
+        <h2>Step 15: Add a New Email Account</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Email account section with "Add Account" button]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the Add Account or Manage Accounts button</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the email account section<br>
+                • Add large arrow pointing to the relevant button<br>
+                • Make the button clearly visible
+            </div>
+        </div>
+        <ol>
+            <li>Locate the <strong>Email Account</strong> section</li>
+            <li>Click <strong>"Manage Accounts"</strong> or <strong>"Add Account"</strong></li>
+        </ol>
+
+        <h2>Step 16: Enter Account Details</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Add Account dialog with fields]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to Name and Email fields</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the add account dialog/form<br>
+                • Add arrow to "Name" field<br>
+                • Add arrow to "Email" field<br>
+                • Show example data entered<br>
+                • Add arrow to "Add" or "Save" button
+            </div>
+        </div>
+        <p>Enter your account information:</p>
+        <ul>
+            <li><strong>Name</strong>: Your name or company name (e.g., "John Smith" or "ABC Company")</li>
+            <li><strong>Email Address</strong>: Your email address (e.g., john@company.com)</li>
+        </ul>
+
+        <h2>Step 17: Select an Account</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Account dropdown showing saved accounts]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to account selector dropdown</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the account dropdown expanded<br>
+                • Add arrow to the dropdown button<br>
+                • Add arrow to one of the account names<br>
+                • Display 2-3 accounts as examples
+            </div>
+        </div>
+        <p>After adding accounts:</p>
+        <ol>
+            <li>Click the <strong>account dropdown</strong></li>
+            <li>Select which account to use as the sender</li>
+            <li>This will be the "From" address in your email drafts</li>
+        </ol>
+
+        <!-- Generating Drafts -->
+        <h1 id="generating">Generating Outlook Drafts</h1>
+        <p>Now you're ready to create email drafts!</p>
+
+        <h2>Step 18: Review Your Email Preview</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Email preview panel showing subject, body, and formatting]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to preview window and key elements</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the preview panel with sample content<br>
+                • Add arrow to the preview section title<br>
+                • Add arrow to the subject line in preview<br>
+                • Add arrow to the body content in preview<br>
+                • Highlight how it will appear
+            </div>
+        </div>
+        <p>Before generating drafts:</p>
+        <ol>
+            <li>Check the <strong>Email Preview</strong> section</li>
+            <li>Verify the subject line looks correct</li>
+            <li>Verify the email body content is correct</li>
+            <li>Ensure the formatting is as you want it</li>
+        </ol>
+
+        <h2>Step 19: Choose Draft Save Location</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Draft save location selector]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the folder selection for draft output</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the draft save location section<br>
+                • Add arrow to "Choose Folder" button<br>
+                • Highlight the current selected location if visible
+            </div>
+        </div>
+        <ol>
+            <li>Locate the <strong>"Draft Save Location"</strong> section</li>
+            <li>Click <strong>"Choose Folder"</strong></li>
+            <li>Select where you want the .eml draft files saved
+                <ul>
+                    <li>Recommended: Your Desktop or a dedicated "Email Drafts" folder</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2>Step 20: Generate Outlook Drafts</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Generate Drafts button - MAKE THIS STAND OUT!]</div>
+            <div class="arrow-note">Arrow indicators needed: LARGE arrow pointing to the Generate button</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show the generate button prominently<br>
+                • Add very large, bright red/orange arrow pointing to it<br>
+                • Make this screenshot visually striking as it's the main action<br>
+                • Optionally show a checklist of prerequisites above the button
+            </div>
+        </div>
+        <p>Verify all your settings are correct:</p>
+        <ul class="checklist">
+            <li>PDFs selected</li>
+            <li>Template loaded</li>
+            <li>Account selected</li>
+            <li>Save location chosen</li>
+        </ul>
+        <p>Then click the <strong>"Generate Outlook Drafts"</strong> button</p>
+
+        <h2>Step 21: Locate Your Draft Files</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: File Explorer showing generated .eml files]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to the .eml files created</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show File Explorer with the generated .eml files<br>
+                • Add arrow pointing to 2-3 .eml files<br>
+                • Highlight the file naming pattern<br>
+                • Show file icons clearly
+            </div>
+        </div>
+        <p>After generating:</p>
+        <ol>
+            <li>Navigate to your chosen save location</li>
+            <li>You'll see <strong>one .eml file for each PDF</strong> you selected</li>
+            <li>Files are named: <span class="code">draft_[random]_[PDF-name].eml</span></li>
+        </ol>
+
+        <h2>Step 22: Open Draft in Outlook</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Double-clicking an .eml file]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to a selected .eml file</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show an .eml file highlighted/selected<br>
+                • Add arrow pointing to the file<br>
+                • Optionally add a cursor icon showing double-click action
+            </div>
+        </div>
+        <p>To open a draft in Outlook:</p>
+        <ol>
+            <li><strong>Double-click</strong> any .eml file</li>
+            <li>Microsoft Outlook will open automatically</li>
+            <li>The draft will open as an <strong>editable email</strong></li>
+        </ol>
+
+        <h2>Step 23: View and Edit Draft in Outlook</h2>
+        <div class="screenshot-placeholder">
+            <div class="screenshot-title">[INSERT SCREENSHOT HERE: Outlook window with draft email open]</div>
+            <div class="arrow-note">Arrow indicators needed: Point to To, Subject, Body, Attachment, and Send button</div>
+            <div class="screenshot-instruction">
+                <strong>Instructions for screenshot:</strong><br>
+                • Show Outlook with a draft open<br>
+                • Add arrow to "To" field with email visible<br>
+                • Add arrow to "Subject" field<br>
+                • Add arrow to email body content<br>
+                • Add arrow to the attached PDF at the bottom<br>
+                • Highlight the "Send" button
+            </div>
+        </div>
+        <p>In Outlook, you'll see:</p>
+        <ul>
+            <li><strong>To</strong>: Recipient email address (pre-filled from PDF)</li>
+            <li><strong>Subject</strong>: Your template subject line</li>
+            <li><strong>Body</strong>: Your template email content</li>
+            <li><strong>Attachment</strong>: The PDF file is already attached</li>
+            <li><strong>From</strong>: Your selected account (if configured)</li>
+        </ul>
+
+        <div class="success-box">
+            <strong>You can now:</strong><br>
+            ✓ Edit any part of the email<br>
+            ✓ Add additional recipients<br>
+            ✓ Modify the subject or body<br>
+            ✓ Add more attachments<br>
+            ✓ Send the email
+        </div>
+
+        <!-- Troubleshooting -->
+        <h1 id="troubleshooting">Troubleshooting</h1>
+
+        <h2>Issue: PDFs Not Loading</h2>
+        <div class="warning-box">
+            <strong>Symptom:</strong> No PDFs appear after selecting a folder
+        </div>
+        <p><strong>Solutions:</strong></p>
+        <ol>
+            <li>Verify the folder contains PDF files (not Word docs or other formats)</li>
+            <li>Check that PDFs are not password-protected</li>
+            <li>Ensure PDFs contain actual text (not just scanned images)</li>
+            <li>Try selecting the folder again</li>
+        </ol>
+
+        <h2>Issue: No Email Addresses Extracted</h2>
+        <div class="warning-box">
+            <strong>Symptom:</strong> PDFs load but email column is empty
+        </div>
+        <p><strong>Solutions:</strong></p>
+        <ol>
+            <li>Open the PDF manually and verify it contains email addresses</li>
+            <li>Check that emails are in standard format (name@domain.com)</li>
+            <li>Some PDFs may have emails as images - these cannot be extracted</li>
+            <li>Try a different PDF to test</li>
+        </ol>
+
+        <h2>Issue: Outlook Drafts Won't Open</h2>
+        <div class="warning-box">
+            <strong>Symptom:</strong> Double-clicking .eml file does nothing or shows error
+        </div>
+        <p><strong>Solutions:</strong></p>
+        <ol>
+            <li>Verify Microsoft Outlook is installed on your computer</li>
+            <li>Set Outlook as your default email program:
+                <ul>
+                    <li>Settings → Apps → Default apps → Email → Select Outlook</li>
+                </ul>
+            </li>
+            <li>Right-click the .eml file → "Open with" → Choose Outlook</li>
+            <li>Restart your computer and try again</li>
+        </ol>
+
+        <h2>Issue: Draft Opens as Read-Only</h2>
+        <div class="warning-box">
+            <strong>Symptom:</strong> Cannot edit the draft in Outlook
+        </div>
+        <p><strong>Solution:</strong></p>
+        <ul>
+            <li>This should not happen in version 1.0.0</li>
+            <li>If it does occur, close Outlook completely</li>
+            <li>Delete the .eml file</li>
+            <li>Generate a new draft from Speedy Statements</li>
+            <li>If problem persists, reinstall Speedy Statements</li>
+        </ul>
+
+        <h2>Issue: PDF Not Attached to Email</h2>
+        <div class="warning-box">
+            <strong>Symptom:</strong> Draft opens but PDF is missing
+        </div>
+        <p><strong>Solutions:</strong></p>
+        <ol>
+            <li>Verify the PDF file still exists in its original location</li>
+            <li>Try generating the draft again</li>
+            <li>Manually attach the PDF in Outlook if needed</li>
+        </ol>
+
+        <!-- Tips & Best Practices -->
+        <h1>Tips & Best Practices</h1>
+
+        <h2>Organizing Your PDFs</h2>
+        <div class="tip-box">
+            <ul>
+                <li>Keep all statement PDFs in a dedicated folder</li>
+                <li>Use clear, consistent naming for PDF files</li>
+                <li>Archive old PDFs after processing</li>
+            </ul>
+        </div>
+
+        <h2>Using Templates Effectively</h2>
+        <div class="tip-box">
+            <ul>
+                <li>Create separate templates for different purposes</li>
+                <li>Use descriptive template names</li>
+                <li>Update templates regularly to keep content fresh</li>
+            </ul>
+        </div>
+
+        <h2>Managing Multiple Accounts</h2>
+        <div class="tip-box">
+            <ul>
+                <li>Add all your company email accounts</li>
+                <li>Use descriptive names to distinguish accounts</li>
+                <li>Select the appropriate account for each batch of emails</li>
+            </ul>
+        </div>
+
+        <h2>Workflow Efficiency</h2>
+        <div class="tip-box">
+            <ol>
+                <li>Export all PDFs first</li>
+                <li>Set up templates in advance</li>
+                <li>Process PDFs in batches</li>
+                <li>Review one draft before generating all of them</li>
+                <li>Send emails in groups from Outlook</li>
+            </ol>
+        </div>
+
+        <!-- Additional Information -->
+        <h1>Additional Information</h1>
+
+        <h2>Data Storage</h2>
+        <p>All your templates and accounts are stored locally at:</p>
+        <div class="code-block">C:\Users\[YourName]\AppData\Roaming\SpeedyStatements\data\</div>
+        <p>This data is specific to your installation and is not shared between computers.</p>
+
+        <h2>System Requirements</h2>
+        <ul>
+            <li>Windows 10 or Windows 11</li>
+            <li>Microsoft Outlook (for opening .eml draft files)</li>
+            <li>200 MB free disk space</li>
+        </ul>
+
+        <h2>Support</h2>
+        <p>For technical issues or questions, contact your IT department or the person who provided you with this software.</p>
+
+        <!-- Quick Reference -->
+        <h1>Quick Reference Card</h1>
+        <div class="success-box">
+            <h3>Quick Steps:</h3>
+            <ol>
+                <li>Export PDFs from Adelaide Database → <span class="code">C:\Data\AAWIN\Emails</span></li>
+                <li>Launch Speedy Statements</li>
+                <li>Browse to PDF folder</li>
+                <li>Select PDFs (use Select All if needed)</li>
+                <li>Load or create email template</li>
+                <li>Select email account</li>
+                <li>Choose draft save location</li>
+                <li>Click "Generate Outlook Drafts"</li>
+                <li>Open .eml files from save location</li>
+                <li>Edit and send in Outlook</li>
+            </ol>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <strong>Speedy Statements Version 1.0.0</strong><br>
+            © 2025 - Made with Emergent<br>
+            <br>
+            <em>End of User Guide</em>
+        </div>
+
+    </div>
+</body>
+</html>
