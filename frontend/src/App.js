@@ -331,19 +331,23 @@ function App() {
         if (response.data && response.data.success) {
           const { summary, download_url, filename } = response.data;
           
-          // Download the ZIP file using a hidden iframe (no new tab!)
-          triggerDownload(`${BACKEND_URL}${download_url}`, filename);
+          // Set download ready state - show a clickable download button
+          setDownloadReady({
+            url: `${BACKEND_URL}${download_url}`,
+            filename: filename,
+            summary: summary
+          });
           
           // Show success message
           if (summary.failed > 0) {
             toast.success(`Generated ${summary.successful} draft(s), ${summary.failed} failed`, {
-              duration: 8000,
-              description: `Downloading ZIP file: ${filename}. Check the included report for details.`
+              duration: 10000,
+              description: `Click the DOWNLOAD button below to get your ZIP file.`
             });
           } else {
             toast.success(`Successfully generated ${summary.successful} draft email(s)!`, {
-              duration: 8000,
-              description: `Downloading ZIP file: ${filename}. Extract and double-click .eml files to open in Outlook.`
+              duration: 10000,
+              description: `Click the DOWNLOAD button below to get your ZIP file.`
             });
           }
         } else {
