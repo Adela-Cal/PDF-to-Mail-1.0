@@ -1,0 +1,33 @@
+Content-Type: multipart/mixed; boundary="===============0406676612237560878=="
+MIME-Version: 1.0
+To: john.doe@example.com
+Subject: CURSOR TEST: Important Document Review Required
+X-Unsent: 1
+X-UnsentDraft: 1
+
+--===============0406676612237560878==
+Content-Type: text/html; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+BEGINNING TEXT:&nbsp; [MIDDLE INSERTION]&nbsp; [END TEXT ADDITION]<div><br></div><div>This is a continuous typing test to verify that the cursor does not jump to unexpected positions while typing. The&nbsp; [AFTER REFOCUS]cursor should remain stable throughout this entire sentence without any interruptions or unexpected movements.</div>
+--===============0406676612237560878==
+Content-Type: application/pdf
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=test_with_email.pdf
+
+JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2Jq
+CjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2Jq
+CjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA2MTIg
+NzkyXQovQ29udGVudHMgNCAwIFIKL1Jlc291cmNlcyA8PAovRm9udCA8PAovRjEgNSAwIFIKPj4K
+Pj4KPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCAxMjAKPj4Kc3RyZWFtCkJUCi9GMSAxMiBU
+Zgo3MiA3MjAgVGQKKENvbnRhY3QgSW5mb3JtYXRpb246KSBUagowIC0yMCBUZAooRW1haWw6IGpv
+aG4uZG9lQGV4YW1wbGUuY29tKSBUagowIC0yMCBUZAooUGhvbmU6IDU1NS0xMjMtNDU2NykgVGoK
+RVQKZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqCjw8Ci9UeXBlIC9Gb250Ci9TdWJ0eXBlIC9UeXBl
+MQovQmFzZUZvbnQgL0hlbHZldGljYQo+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUz
+NSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAw
+MDAwMCBuIAowMDAwMDAwMjczIDAwMDAwIG4gCjAwMDAwMDA0NDUgMDAwMDAgbiAKdHJhaWxlcgo8
+PAovU2l6ZSA2Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgo1MjIKJSVFT0Y=
+
+--===============0406676612237560878==--
