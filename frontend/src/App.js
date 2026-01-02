@@ -411,61 +411,36 @@ function App() {
     }
   };
 
-  // Helper function to download a file with multiple fallback methods
+  // Helper function to download a file using file-saver library
   const downloadFile = async (blob, filename) => {
-    // Method 1: Use navigator.msSaveBlob for IE/Edge
-    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-      window.navigator.msSaveOrOpenBlob(blob, filename);
-      return true;
-    }
-    
     try {
-      // Method 2: Create a download link with data URL for smaller files
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      
-      // Set attributes
-      link.href = url;
-      link.download = filename;
-      link.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
-      link.setAttribute('target', '_blank');
-      
-      // Append to document
-      document.body.appendChild(link);
-      
-      // Dispatch a real click event
-      const clickEvent = new MouseEvent('click', {
-        view: window,
-        bubbles: true,
-        cancelable: false
-      });
-      link.dispatchEvent(clickEvent);
-      
-      // Give browser time to start download
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Cleanup
-      document.body.removeChild(link);
-      
-      // Delay URL revocation to ensure download started
-      setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-      }, 1000);
-      
+      // Use file-saver library which has excellent browser compatibility
+      saveAs(blob, filename);
       console.log(`Download triggered for: ${filename}`);
       return true;
     } catch (error) {
-      console.error('Download method failed:', error);
+      console.error('file-saver download failed:', error);
       
+      // Fallback: try manual blob download
       try {
-        // Method 3: Open in new window as last resort
         const url = window.URL.createObjectURL(blob);
-        const newWindow = window.open(url, '_blank');
-        if (!newWindow) {
-          // Popup blocked - try direct location change
-          window.location.href = url;
-        }
-        setTimeout(() => window.URL.revokeObjectURL(url), 5000);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
+        document.body.appendChild(link);
+        
+        const clickEvent = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: false
+        });
+        link.dispatchEvent(clickEvent);
+        
+        await new Promise(resolve => setTimeout(resolve, 200));
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        
         return true;
       } catch (error2) {
         console.error('All download methods failed:', error2);
