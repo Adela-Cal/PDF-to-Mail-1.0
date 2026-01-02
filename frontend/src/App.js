@@ -278,6 +278,7 @@ function App() {
     let successCount = 0;
     const failedStatements = []; // Track failed generations
     const successfulStatements = []; // Track successful generations
+    const downloadUrls = []; // Collect download URLs
     
     // Get selected email account details
     const account = emailAccounts.find(a => a.id === selectedAccount);
@@ -301,8 +302,6 @@ function App() {
       const recipientEmail = pdf.emails[0];
 
       try {
-        let response;
-        
         // Check if using uploaded files or folder path
         if (uploadedFiles.length > 0) {
           const file = uploadedFiles.find(f => f.name === pdfFilename);
@@ -315,20 +314,38 @@ function App() {
             if (senderEmail) formData.append('sender_email', senderEmail);
             if (senderName) formData.append('sender_name', senderName);
 
-            response = await axios.post(`${API}/outlook/draft-upload`, formData, {
-              headers: { 'Content-Type': 'multipart/form-data' },
-              responseType: 'blob'
+            // Use the new endpoint that returns a download URL
+            const response = await axios.post(`${API}/outlook/draft-create`, formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
             });
+
+            if (response.data && response.data.success) {
+              successCount++;
+              successfulStatements.push({
+                filename: pdfFilename,
+                recipient: recipientEmail,
+                outputFile: response.data.filename
+              });
+              downloadUrls.push({
+                url: `${BACKEND_URL}${response.data.download_url}`,
+                filename: response.data.filename
+              });
+              console.log(`Draft created: ${response.data.filename}`);
+            } else {
+              failedStatements.push({
+                filename: pdfFilename,
+                reason: "Server did not return success"
+              });
+            }
           } else {
             failedStatements.push({
               filename: pdfFilename,
               reason: "File not found in uploaded files"
             });
-            continue;
           }
         } else {
-          // Use folder path method
-          response = await axios.post(`${API}/outlook/draft`, {
+          // Use folder path method with blob (for standalone app)
+          const response = await axios.post(`${API}/outlook/draft`, {
             pdf_filename: pdf.filename,
             pdf_path: pdf.file_path,
             recipient_email: recipientEmail,
@@ -339,47 +356,28 @@ function App() {
           }, {
             responseType: 'blob'
           });
-        }
 
-        if (response && response.data) {
-          // Get filename from response headers or create one
-          const contentDisposition = response.headers['content-disposition'];
-          let filename = `draft_${pdfFilename.replace('.pdf', '')}.eml`;
-          
-          if (contentDisposition) {
-            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-            if (filenameMatch && filenameMatch[1]) {
-              filename = filenameMatch[1].replace(/['"]/g, '');
+          if (response && response.data) {
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = `draft_${pdfFilename.replace('.pdf', '')}.eml`;
+            
+            if (contentDisposition) {
+              const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+              if (filenameMatch && filenameMatch[1]) {
+                filename = filenameMatch[1].replace(/['"]/g, '');
+              }
             }
-          }
-          
-          // Create blob with correct MIME type
-          const blob = new Blob([response.data], { 
-            type: 'application/octet-stream'
-          });
-          
-          // Use multiple download methods for better browser compatibility
-          const downloadSuccess = await downloadFile(blob, filename);
-          
-          if (downloadSuccess) {
+            
+            const blob = new Blob([response.data], { type: 'application/octet-stream' });
+            saveAs(blob, filename);
+            
             successCount++;
             successfulStatements.push({
               filename: pdfFilename,
               recipient: recipientEmail,
               outputFile: filename
             });
-            console.log(`Successfully downloaded: ${filename}`);
-          } else {
-            failedStatements.push({
-              filename: pdfFilename,
-              reason: "Download was blocked or failed"
-            });
           }
-        } else {
-          failedStatements.push({
-            filename: pdfFilename,
-            reason: "No response data received from server"
-          });
         }
       } catch (error) {
         console.error(`Error generating draft for ${pdfFilename}:`, error);
@@ -390,62 +388,47 @@ function App() {
         toast.error(`Failed to generate draft for ${pdfFilename}`);
       }
       
-      // Add delay between downloads to ensure browser processes each one
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Small delay between requests
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+
+    // Now trigger all downloads using direct links (this works in Chrome)
+    if (downloadUrls.length > 0) {
+      toast.info(`Opening ${downloadUrls.length} download(s)...`, { duration: 3000 });
+      
+      for (const download of downloadUrls) {
+        // Open each download URL in a new tab/trigger download
+        window.open(download.url, '_blank');
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
 
     setLoading(false);
     
-    // Generate and download the report
-    generateReport(successfulStatements, failedStatements);
+    // Generate and download the report using direct download
+    await generateReport(successfulStatements, failedStatements);
     
     if (successCount > 0) {
       toast.success(`Generated ${successCount} draft email(s)!`, {
         duration: 8000,
         description: failedStatements.length > 0 
           ? `${failedStatements.length} statement(s) failed. Check the report file for details.`
-          : `All drafts generated successfully! Check your Downloads folder.`
+          : `All drafts generated successfully!`
       });
     } else {
       toast.error("Failed to generate any draft emails. Check the report file for details.");
     }
   };
 
-  // Helper function to download a file using file-saver library
+  // Helper function kept for standalone app compatibility
   const downloadFile = async (blob, filename) => {
     try {
-      // Use file-saver library which has excellent browser compatibility
       saveAs(blob, filename);
       console.log(`Download triggered for: ${filename}`);
       return true;
     } catch (error) {
       console.error('file-saver download failed:', error);
-      
-      // Fallback: try manual blob download
-      try {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
-        document.body.appendChild(link);
-        
-        const clickEvent = new MouseEvent('click', {
-          view: window,
-          bubbles: true,
-          cancelable: false
-        });
-        link.dispatchEvent(clickEvent);
-        
-        await new Promise(resolve => setTimeout(resolve, 200));
-        document.body.removeChild(link);
-        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-        
-        return true;
-      } catch (error2) {
-        console.error('All download methods failed:', error2);
-        return false;
-      }
+      return false;
     }
   };
 
