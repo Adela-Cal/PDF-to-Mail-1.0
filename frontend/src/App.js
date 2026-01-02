@@ -594,10 +594,9 @@ function App() {
                             fontSize: '14px',
                             lineHeight: '1.6'
                           }}
-                          dangerouslySetInnerHTML={{ __html: emailPreview }}
                         />
                         <p className="text-xs text-slate-500">
-                          💡 Tip: Click inside the preview to edit text, select and drag to rearrange content
+                          💡 Tip: Click inside the preview to edit text. Changes are saved when you click outside.
                         </p>
                       </div>
                     </CardContent>
