@@ -210,7 +210,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Generate Outlook drafts as editable .eml files"
+    - "Email preview editor cursor jumping fix"
+    - "Download .eml files in web preview"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -220,3 +221,5 @@ agent_communication:
     message: "Fixed the critical Outlook draft issue by adding X-Unsent and X-UnsentDraft headers to the .eml file generation. These headers instruct Outlook to open the files as editable drafts instead of read-only messages. Modified both /api/outlook/draft and /api/outlook/draft-upload endpoints. Ready for backend testing to verify the fix works correctly."
   - agent: "testing"
     message: "BACKEND TESTING COMPLETE ✅ - Comprehensive testing of both Outlook draft endpoints successful. Created backend_test.py with thorough validation of .eml file generation. All critical success criteria met: proper draft headers (X-Unsent: 1, X-UnsentDraft: 1), correct email formatting, PDF attachments, and HTML body content. The fix for generating editable Outlook drafts is working perfectly. Both /api/outlook/draft and /api/outlook/draft-upload endpoints are fully functional."
+  - agent: "main"
+    message: "NEW FIXES APPLIED - Two issues reported by user: 1) Cursor jumping in email preview editor - Fixed by removing onInput handler that caused React re-renders, using ref-based approach instead. 2) Downloads not working in web preview - Need to test blob download mechanism. Please test these two frontend fixes with focus on: (a) typing in the email preview editor should not cause cursor to jump, (b) clicking Generate Drafts should download .eml files"
