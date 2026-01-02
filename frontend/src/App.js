@@ -283,8 +283,6 @@ function App() {
     
     // Use the current preview content
     const finalEmailBody = currentPreviewContent;
-    // Use the preview content (which may have been edited)
-    const finalEmailBody = emailPreview || emailBody;
 
     for (const pdfFilename of selectedPdfs) {
       const pdf = pdfs.find(p => p.filename === pdfFilename);
