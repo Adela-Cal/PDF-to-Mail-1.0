@@ -526,7 +526,7 @@ function App() {
               )}
               
               {/* Email Preview Section */}
-              {pdfs.length > 0 && selectedPdfs.length > 0 && emailPreview && (
+              {pdfs.length > 0 && selectedPdfs.length > 0 && (emailPreview || emailBody) && (
                 <div className="mt-6 space-y-3" data-testid="email-preview-section">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-lg text-slate-800">Email Preview (Template)</h3>
@@ -534,7 +534,7 @@ function App() {
                       data-testid="reset-preview-btn"
                       variant="outline"
                       size="sm"
-                      onClick={() => setEmailPreview(emailBody)}
+                      onClick={handleResetPreview}
                       className="text-slate-600 border-slate-300 hover:bg-slate-50"
                     >
                       Reset to Original
@@ -582,11 +582,12 @@ function App() {
                         </Label>
                         <div
                           id="email-preview"
+                          ref={emailPreviewRef}
                           data-testid="email-preview-editor"
                           contentEditable
                           suppressContentEditableWarning
-                          onBlur={(e) => setEmailPreview(e.currentTarget.innerHTML)}
-                          onInput={(e) => setEmailPreview(e.currentTarget.innerHTML)}
+                          onFocus={handlePreviewFocus}
+                          onBlur={handlePreviewBlur}
                           className="min-h-[200px] p-4 border-2 border-slate-200 rounded-lg bg-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 overflow-auto"
                           style={{ 
                             fontFamily: 'Arial, sans-serif',
