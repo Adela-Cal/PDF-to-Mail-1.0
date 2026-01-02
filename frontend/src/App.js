@@ -275,6 +275,8 @@ function App() {
 
     setLoading(true);
     let successCount = 0;
+    const failedStatements = []; // Track failed generations
+    const successfulStatements = []; // Track successful generations
     
     // Get selected email account details
     const account = emailAccounts.find(a => a.id === selectedAccount);
@@ -287,6 +289,10 @@ function App() {
     for (const pdfFilename of selectedPdfs) {
       const pdf = pdfs.find(p => p.filename === pdfFilename);
       if (!pdf || pdf.emails.length === 0) {
+        failedStatements.push({
+          filename: pdfFilename,
+          reason: "No email address found in PDF"
+        });
         toast.warning(`No email found in ${pdfFilename}`);
         continue;
       }
@@ -312,6 +318,12 @@ function App() {
               headers: { 'Content-Type': 'multipart/form-data' },
               responseType: 'blob'
             });
+          } else {
+            failedStatements.push({
+              filename: pdfFilename,
+              reason: "File not found in uploaded files"
+            });
+            continue;
           }
         } else {
           // Use folder path method
@@ -342,30 +354,38 @@ function App() {
           
           // Create blob with correct MIME type
           const blob = new Blob([response.data], { 
-            type: 'message/rfc822'
+            type: 'application/octet-stream'
           });
           
-          // Create download link with better browser compatibility
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = filename;
+          // Use multiple download methods for better browser compatibility
+          const downloadSuccess = await downloadFile(blob, filename);
           
-          // Force download by appending to body and clicking
-          document.body.appendChild(link);
-          link.click();
-          
-          // Cleanup after a short delay
-          setTimeout(() => {
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          }, 250);
-          
-          successCount++;
-          console.log(`Successfully downloaded: ${filename}`);
+          if (downloadSuccess) {
+            successCount++;
+            successfulStatements.push({
+              filename: pdfFilename,
+              recipient: recipientEmail,
+              outputFile: filename
+            });
+            console.log(`Successfully downloaded: ${filename}`);
+          } else {
+            failedStatements.push({
+              filename: pdfFilename,
+              reason: "Download was blocked or failed"
+            });
+          }
+        } else {
+          failedStatements.push({
+            filename: pdfFilename,
+            reason: "No response data received from server"
+          });
         }
       } catch (error) {
         console.error(`Error generating draft for ${pdfFilename}:`, error);
+        failedStatements.push({
+          filename: pdfFilename,
+          reason: error.response?.data?.detail || error.message || "Unknown error"
+        });
         toast.error(`Failed to generate draft for ${pdfFilename}`);
       }
       
@@ -375,14 +395,102 @@ function App() {
 
     setLoading(false);
     
+    // Generate and download the report
+    generateReport(successfulStatements, failedStatements);
+    
     if (successCount > 0) {
       toast.success(`Generated ${successCount} draft email(s)!`, {
         duration: 8000,
-        description: `Check your Downloads folder for .eml files. If you don't see them, check your browser's download settings or try allowing downloads for this site.`
+        description: failedStatements.length > 0 
+          ? `${failedStatements.length} statement(s) failed. Check the report file for details.`
+          : `All drafts generated successfully! Check your Downloads folder.`
       });
     } else {
-      toast.error("Failed to generate any draft emails. Please check console for errors.");
+      toast.error("Failed to generate any draft emails. Check the report file for details.");
     }
+  };
+
+  // Helper function to download a file with multiple fallback methods
+  const downloadFile = async (blob, filename) => {
+    try {
+      // Method 1: Use the download attribute with a link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.style.display = 'none';
+      
+      // Add link to document
+      document.body.appendChild(link);
+      
+      // Trigger click
+      link.click();
+      
+      // Cleanup after delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      return true;
+    } catch (error) {
+      console.error('Download method 1 failed:', error);
+      
+      try {
+        // Method 2: Use window.open as fallback
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        return true;
+      } catch (error2) {
+        console.error('Download method 2 failed:', error2);
+        return false;
+      }
+    }
+  };
+
+  // Generate a report of successful and failed statement generations
+  const generateReport = (successful, failed) => {
+    const timestamp = new Date().toLocaleString();
+    let reportContent = `SPEEDY STATEMENTS - GENERATION REPORT\n`;
+    reportContent += `Generated: ${timestamp}\n`;
+    reportContent += `${'='.repeat(50)}\n\n`;
+    
+    // Summary
+    reportContent += `SUMMARY\n`;
+    reportContent += `${'-'.repeat(30)}\n`;
+    reportContent += `Total Processed: ${successful.length + failed.length}\n`;
+    reportContent += `Successful: ${successful.length}\n`;
+    reportContent += `Failed: ${failed.length}\n\n`;
+    
+    // Successful generations
+    if (successful.length > 0) {
+      reportContent += `SUCCESSFULLY GENERATED\n`;
+      reportContent += `${'-'.repeat(30)}\n`;
+      successful.forEach((item, index) => {
+        reportContent += `${index + 1}. ${item.filename}\n`;
+        reportContent += `   Recipient: ${item.recipient}\n`;
+        reportContent += `   Output: ${item.outputFile}\n\n`;
+      });
+    }
+    
+    // Failed generations
+    if (failed.length > 0) {
+      reportContent += `FAILED TO GENERATE\n`;
+      reportContent += `${'-'.repeat(30)}\n`;
+      failed.forEach((item, index) => {
+        reportContent += `${index + 1}. ${item.filename}\n`;
+        reportContent += `   Reason: ${item.reason}\n\n`;
+      });
+    }
+    
+    reportContent += `${'='.repeat(50)}\n`;
+    reportContent += `End of Report\n`;
+    
+    // Download the report as a text file
+    const reportBlob = new Blob([reportContent], { type: 'text/plain' });
+    const reportFilename = `statement_report_${new Date().toISOString().slice(0, 10)}.txt`;
+    
+    downloadFile(reportBlob, reportFilename);
   };
 
   return (
