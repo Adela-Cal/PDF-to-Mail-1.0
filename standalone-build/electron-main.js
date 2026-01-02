@@ -13,41 +13,39 @@ function getDownloadsFolder() {
 
 // Setup download handler for .eml files
 function setupDownloadHandler() {
-  session.defaultSession.on('will-download', (event, item, webContents) => {
+  session.defaultSession.on('will-download', async (event, item, webContents) => {
     const filename = item.getFilename();
     const downloadsPath = getDownloadsFolder();
-    const savePath = path.join(downloadsPath, filename);
+    let finalSavePath = path.join(downloadsPath, filename);
     
     console.log('Download initiated:', filename);
-    console.log('Saving to:', savePath);
+    console.log('Default save path:', finalSavePath);
     
-    // For .eml files, show a save dialog
-    if (filename.endsWith('.eml')) {
-      // Show save dialog to let user choose location
-      dialog.showSaveDialog(mainWindow, {
-        title: 'Save Email Draft',
-        defaultPath: savePath,
-        filters: [
-          { name: 'Email Files', extensions: ['eml'] },
-          { name: 'All Files', extensions: ['*'] }
-        ]
-      }).then(result => {
+    // For .eml files, show a save dialog to let user choose location
+    if (filename.endsWith('.eml') && mainWindow) {
+      try {
+        const result = await dialog.showSaveDialog(mainWindow, {
+          title: 'Save Email Draft',
+          defaultPath: finalSavePath,
+          filters: [
+            { name: 'Email Files', extensions: ['eml'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        });
+        
         if (!result.canceled && result.filePath) {
-          item.setSavePath(result.filePath);
-          console.log('User chose to save to:', result.filePath);
+          finalSavePath = result.filePath;
+          console.log('User chose to save to:', finalSavePath);
         } else {
-          // User cancelled, still save to default location
-          item.setSavePath(savePath);
-          console.log('User cancelled dialog, saving to default:', savePath);
+          console.log('User cancelled dialog, saving to default:', finalSavePath);
         }
-      }).catch(err => {
+      } catch (err) {
         console.error('Save dialog error:', err);
-        item.setSavePath(savePath);
-      });
-    } else {
-      // For other files, save to downloads automatically
-      item.setSavePath(savePath);
+      }
     }
+    
+    // Set the save path (must be done synchronously before download starts)
+    item.setSavePath(finalSavePath);
     
     item.on('updated', (event, state) => {
       if (state === 'interrupted') {
@@ -56,7 +54,11 @@ function setupDownloadHandler() {
         if (item.isPaused()) {
           console.log('Download paused');
         } else {
-          console.log(`Downloading: ${item.getReceivedBytes()} / ${item.getTotalBytes()}`);
+          const received = item.getReceivedBytes();
+          const total = item.getTotalBytes();
+          if (total > 0) {
+            console.log(`Downloading: ${Math.round((received / total) * 100)}%`);
+          }
         }
       }
     });
@@ -66,19 +68,23 @@ function setupDownloadHandler() {
         const savedPath = item.getSavePath();
         console.log('Download completed:', savedPath);
         
-        // Show notification to user
-        dialog.showMessageBox(mainWindow, {
-          type: 'info',
-          title: 'Download Complete',
-          message: 'Email draft saved successfully!',
-          detail: `Saved to: ${savedPath}\n\nDouble-click the .eml file to open it in Outlook as a draft email.`,
-          buttons: ['OK', 'Open Folder']
-        }).then(result => {
-          if (result.response === 1) {
-            // User clicked "Open Folder"
-            shell.showItemInFolder(savedPath);
-          }
-        });
+        // Show notification to user with option to open folder
+        if (mainWindow) {
+          dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            title: 'Download Complete',
+            message: 'Email draft saved successfully!',
+            detail: `Saved to: ${savedPath}\n\nDouble-click the .eml file to open it in Outlook as a draft email.`,
+            buttons: ['OK', 'Open Folder']
+          }).then(result => {
+            if (result.response === 1) {
+              // User clicked "Open Folder"
+              shell.showItemInFolder(savedPath);
+            }
+          }).catch(err => {
+            console.error('Message box error:', err);
+          });
+        }
       } else {
         console.log('Download failed:', state);
         dialog.showErrorBox('Download Failed', `Failed to save ${filename}. State: ${state}`);
