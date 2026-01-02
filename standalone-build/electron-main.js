@@ -154,6 +154,9 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+  
+  // Setup download handling after window is created
+  setupDownloadHandler();
 }
 
 // App lifecycle
