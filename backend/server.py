@@ -381,6 +381,115 @@ async def create_outlook_draft_from_upload(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# NEW: Create draft and return download URL (for Chrome compatibility)
+@api_router.post("/outlook/draft-create")
+async def create_outlook_draft_with_url(
+    pdf_file: UploadFile = File(...),
+    recipient_email: str = Form(...),
+    subject: str = Form(...),
+    body: str = Form(...),
+    sender_email: str = Form(None),
+    sender_name: str = Form(None)
+):
+    """Create draft and return a download URL instead of direct file response"""
+    try:
+        # Create the email message
+        msg = MIMEMultipart()
+        msg['To'] = recipient_email
+        msg['Subject'] = subject
+        
+        if sender_email:
+            if sender_name:
+                msg['From'] = f'"{sender_name}" <{sender_email}>'
+            else:
+                msg['From'] = sender_email
+        
+        msg['X-Unsent'] = '1'
+        msg['X-UnsentDraft'] = '1'
+        msg.attach(MIMEText(body, 'html'))
+        
+        # Read and attach PDF file
+        pdf_content = await pdf_file.read()
+        part = MIMEBase('application', 'pdf')
+        part.set_payload(pdf_content)
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename={pdf_file.filename}')
+        msg.attach(part)
+        
+        # Generate unique file ID and save
+        file_id = uuid.uuid4().hex
+        eml_filename = f"draft_{file_id[:8]}_{pdf_file.filename.replace('.pdf', '')}.eml"
+        eml_path = os.path.join('/tmp', eml_filename)
+        
+        with open(eml_path, 'w', encoding='utf-8') as eml_file:
+            eml_file.write(msg.as_string())
+        
+        # Store file path for later download
+        generated_files[file_id] = eml_path
+        
+        return JSONResponse({
+            "success": True,
+            "file_id": file_id,
+            "filename": eml_filename,
+            "download_url": f"/api/download/{file_id}"
+        })
+        
+    except Exception as e:
+        logging.error(f"Error creating draft: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# NEW: Direct file download endpoint (GET request - works in all browsers)
+@api_router.get("/download/{file_id}")
+async def download_file(file_id: str):
+    """Download a generated file by ID - uses GET which works reliably in all browsers"""
+    if file_id not in generated_files:
+        raise HTTPException(status_code=404, detail="File not found or expired")
+    
+    file_path = generated_files[file_id]
+    
+    if not os.path.exists(file_path):
+        del generated_files[file_id]
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    filename = os.path.basename(file_path)
+    
+    return FileResponse(
+        file_path,
+        media_type='application/octet-stream',
+        filename=filename,
+        headers={
+            "Content-Disposition": f"attachment; filename=\"{filename}\"",
+            "Cache-Control": "no-cache"
+        }
+    )
+
+
+# NEW: Create report file and return download URL
+@api_router.post("/report/create")
+async def create_report(report_content: str = Form(...), filename: str = Form(...)):
+    """Create a report file and return download URL"""
+    try:
+        file_id = uuid.uuid4().hex
+        report_path = os.path.join('/tmp', f"{file_id}_{filename}")
+        
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(report_content)
+        
+        generated_files[file_id] = report_path
+        
+        return JSONResponse({
+            "success": True,
+            "file_id": file_id,
+            "filename": filename,
+            "download_url": f"/api/download/{file_id}"
+        })
+        
+    except Exception as e:
+        logging.error(f"Error creating report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.get("/")
 async def root():
     return {"message": "Speedy Statements API"}
