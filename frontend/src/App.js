@@ -37,6 +37,8 @@ function App() {
   
   // Email preview
   const [emailPreview, setEmailPreview] = useState("");
+  const emailPreviewRef = useRef(null);
+  const isEditingPreview = useRef(false);
 
   // Load templates and email accounts on mount
   useEffect(() => {
