@@ -247,6 +247,18 @@ frontend:
         agent: "testing"
         comment: "NEW DOWNLOAD MECHANISM COMPREHENSIVE TESTING COMPLETED ✅ - Thoroughly tested the redesigned download system: (1) PDF upload and email extraction working perfectly (john.smith@testcompany.com extracted), (2) Email subject and body entry successful, (3) PDF selection working correctly, (4) POST /api/outlook/draft-create returns proper JSON response with success:true, file_id:'365b7f7e941b489d827f060a47e11f4c', filename:'draft_365b7f7e_test_statement_with_email.eml', download_url:'/api/download/365b7f7e941b489d827f060a47e11f4c', (5) window.open() successfully opens 2 new tabs for downloads (.eml file + report), (6) GET /api/download/{file_id} endpoint serves files correctly (verified 2718-byte .eml file download), (7) Downloaded .eml file contains proper structure with critical X-Unsent:1 and X-UnsentDraft:1 headers for Outlook draft functionality, (8) Report generation included automatically. The new direct GET endpoint download mechanism is working flawlessly and completely resolves previous browser compatibility issues."
 
+  - task: "NEW batch download feature - single ZIP file with hidden iframe"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW BATCH DOWNLOAD FEATURE IDENTIFIED: User requested testing of new batch download functionality that processes multiple PDFs in one request and returns a single ZIP file containing all .eml drafts + report. Key requirements: (1) NO new browser tabs should open, (2) Uses hidden iframe for download, (3) Calls /api/outlook/batch-create endpoint, (4) Downloads single ZIP file with timestamp naming. This replaces the previous multiple-tab approach. Ready for comprehensive testing."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
