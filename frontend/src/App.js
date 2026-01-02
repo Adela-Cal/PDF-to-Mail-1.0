@@ -40,6 +40,9 @@ function App() {
   const [emailPreview, setEmailPreview] = useState("");
   const emailPreviewRef = useRef(null);
   const isEditingPreview = useRef(false);
+  
+  // Download state - shows download link after generation
+  const [downloadReady, setDownloadReady] = useState(null);
 
   // Load templates and email accounts on mount
   useEffect(() => {
