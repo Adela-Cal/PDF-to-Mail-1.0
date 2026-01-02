@@ -267,7 +267,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "NEW download mechanism using direct GET endpoints"
+    - "NEW batch download feature - single ZIP file with hidden iframe"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
