@@ -233,10 +233,13 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "Download .eml files in web preview"
+    - "Generate failed statements report"
+  stuck_tasks:
+    - "Download .eml files in web preview"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
 
 agent_communication:
   - agent: "main"
