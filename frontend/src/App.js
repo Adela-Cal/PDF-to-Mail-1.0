@@ -416,22 +416,6 @@ function App() {
     setLoading(false);
   };
 
-  // Trigger download using hidden iframe (doesn't open new tabs)
-  const triggerDownload = (url, filename) => {
-    // Create a hidden iframe to trigger the download
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    
-    // Clean up iframe after download starts
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-    }, 5000);
-    
-    console.log(`Download triggered for: ${filename}`);
-  };
-
   // Helper function kept for standalone app compatibility
   const downloadFile = async (blob, filename) => {
     try {
