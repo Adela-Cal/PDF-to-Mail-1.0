@@ -172,6 +172,36 @@ frontend:
         agent: "main"
         comment: "UI for generating drafts exists, needs testing if issues arise"
 
+  - task: "Email preview editor cursor jumping fix"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported cursor jumps to top-left of text box when typing in email preview editor"
+      - working: false
+        agent: "main"
+        comment: "Fixed by removing onInput handler and dangerouslySetInnerHTML that caused re-renders. Now using ref-based approach where content is only saved onBlur, and initial content is set via ref.innerHTML instead of controlled state"
+
+  - task: "Download .eml files in web preview"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported .eml files not downloading to downloads folder when testing in web preview"
+      - working: false
+        agent: "main"
+        comment: "Download mechanism uses blob URL and programmatic link click. Need to test if this works in web preview. Also added download handler for Electron standalone app."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
