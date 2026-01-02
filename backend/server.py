@@ -1,12 +1,12 @@
 from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional
+from typing import List, Optional, Dict
 import uuid
 from datetime import datetime, timezone
 import PyPDF2
@@ -26,6 +26,9 @@ load_dotenv(ROOT_DIR / '.env')
 # JSON Storage connection (replaces MongoDB for standalone app)
 storage = JSONStorage()
 db = DatabaseWrapper(storage)
+
+# Temporary storage for generated files (for direct download)
+generated_files: Dict[str, str] = {}
 
 # Create the main app without a prefix
 app = FastAPI()
