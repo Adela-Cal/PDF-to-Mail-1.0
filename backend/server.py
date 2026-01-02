@@ -595,18 +595,18 @@ async def create_batch_drafts(
         
         # Generate the report
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        report_content = f"SPEEDY STATEMENTS - GENERATION REPORT\n"
+        report_content = "SPEEDY STATEMENTS - GENERATION REPORT\n"
         report_content += f"Generated: {timestamp}\n"
         report_content += f"{'=' * 50}\n\n"
         
-        report_content += f"SUMMARY\n"
+        report_content += "SUMMARY\n"
         report_content += f"{'-' * 30}\n"
         report_content += f"Total Processed: {len(successful) + len(failed)}\n"
         report_content += f"Successful: {len(successful)}\n"
         report_content += f"Failed: {len(failed)}\n\n"
         
         if successful:
-            report_content += f"SUCCESSFULLY GENERATED\n"
+            report_content += "SUCCESSFULLY GENERATED\n"
             report_content += f"{'-' * 30}\n"
             for i, item in enumerate(successful, 1):
                 report_content += f"{i}. {item['filename']}\n"
@@ -614,14 +614,14 @@ async def create_batch_drafts(
                 report_content += f"   Output: {item['output']}\n\n"
         
         if failed:
-            report_content += f"FAILED TO GENERATE\n"
+            report_content += "FAILED TO GENERATE\n"
             report_content += f"{'-' * 30}\n"
             for i, item in enumerate(failed, 1):
                 report_content += f"{i}. {item['filename']}\n"
                 report_content += f"   Reason: {item['reason']}\n\n"
         
         report_content += f"{'=' * 50}\n"
-        report_content += f"End of Report\n"
+        report_content += "End of Report\n"
         
         # Save report to batch directory
         report_filename = f"statement_report_{datetime.now().strftime('%Y-%m-%d')}.txt"
