@@ -229,8 +229,33 @@ function App() {
     }
   };
 
-  // Update preview when body changes
+  // Update preview when body changes (only when not actively editing)
   useEffect(() => {
+    if (!isEditingPreview.current && emailPreviewRef.current) {
+      emailPreviewRef.current.innerHTML = emailBody;
+      setEmailPreview(emailBody);
+    } else if (!isEditingPreview.current) {
+      setEmailPreview(emailBody);
+    }
+  }, [emailBody]);
+
+  // Handle preview editor focus
+  const handlePreviewFocus = useCallback(() => {
+    isEditingPreview.current = true;
+  }, []);
+
+  // Handle preview editor blur - save content
+  const handlePreviewBlur = useCallback((e) => {
+    isEditingPreview.current = false;
+    const content = e.currentTarget.innerHTML;
+    setEmailPreview(content);
+  }, []);
+
+  // Reset preview to original template
+  const handleResetPreview = useCallback(() => {
+    if (emailPreviewRef.current) {
+      emailPreviewRef.current.innerHTML = emailBody;
+    }
     setEmailPreview(emailBody);
   }, [emailBody]);
 
