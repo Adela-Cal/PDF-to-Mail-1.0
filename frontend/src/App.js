@@ -412,37 +412,62 @@ function App() {
 
   // Helper function to download a file with multiple fallback methods
   const downloadFile = async (blob, filename) => {
+    // Method 1: Use navigator.msSaveBlob for IE/Edge
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(blob, filename);
+      return true;
+    }
+    
     try {
-      // Method 1: Use the download attribute with a link
+      // Method 2: Create a download link with data URL for smaller files
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
+      
+      // Set attributes
       link.href = url;
       link.download = filename;
-      link.style.display = 'none';
+      link.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
+      link.setAttribute('target', '_blank');
       
-      // Add link to document
+      // Append to document
       document.body.appendChild(link);
       
-      // Trigger click
-      link.click();
+      // Dispatch a real click event
+      const clickEvent = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: false
+      });
+      link.dispatchEvent(clickEvent);
       
-      // Cleanup after delay
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Give browser time to start download
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Cleanup
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
       
+      // Delay URL revocation to ensure download started
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+      
+      console.log(`Download triggered for: ${filename}`);
       return true;
     } catch (error) {
-      console.error('Download method 1 failed:', error);
+      console.error('Download method failed:', error);
       
       try {
-        // Method 2: Use window.open as fallback
+        // Method 3: Open in new window as last resort
         const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        const newWindow = window.open(url, '_blank');
+        if (!newWindow) {
+          // Popup blocked - try direct location change
+          window.location.href = url;
+        }
+        setTimeout(() => window.URL.revokeObjectURL(url), 5000);
         return true;
       } catch (error2) {
-        console.error('Download method 2 failed:', error2);
+        console.error('All download methods failed:', error2);
         return false;
       }
     }
