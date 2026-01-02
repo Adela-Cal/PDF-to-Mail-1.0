@@ -262,6 +262,18 @@ frontend:
         agent: "testing"
         comment: "NEW BATCH DOWNLOAD FEATURE COMPREHENSIVE TESTING COMPLETED ✅ - Successfully tested all critical requirements: (1) CRITICAL SUCCESS: NO new browser tabs opened during download process, (2) Successfully uploaded 3 test PDFs with email extraction working perfectly (john.smith@testcompany.com, sarah.johnson@example.org, mike.davis@company.net), (3) Form filling and PDF selection working correctly, (4) POST /api/outlook/batch-create API call successful (200 status), (5) Single ZIP file download triggered: 'speedy_statements_20260102_232858.zip' via hidden iframe mechanism, (6) Success toast message displayed: 'Successfully generated 3 draft email(s)! Downloading ZIP file...', (7) ZIP file verified to contain: statement_report_2026-01-02.txt + draft_statement_001.eml + draft_statement_002.eml + draft_statement_003.eml, (8) Download mechanism uses triggerDownload() function with hidden iframe (NO window.open() calls), (9) All .eml files contain proper X-Unsent:1 and X-UnsentDraft:1 headers for Outlook draft functionality. The new batch download feature is working flawlessly and completely replaces the previous multiple-tab approach."
 
+  - task: "NEW manual download button feature - visible download button"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "NEW MANUAL DOWNLOAD BUTTON FEATURE COMPREHENSIVE TESTING COMPLETED ✅ - Successfully tested the NEW manual download button feature as requested: (1) CRITICAL SUCCESS: Large green 'Download Ready' card appears after clicking 'Generate Outlook Drafts', (2) Card displays '✅ Your Files Are Ready!' with generation summary (Generated 2 draft(s)), (3) Shows ZIP filename: 'speedy_statements_20260102_235414.zip', (4) BIG GREEN DOWNLOAD BUTTON with text 'CLICK HERE TO DOWNLOAD ZIP FILE' is prominently displayed, (5) Button is a direct <a href> tag with proper download attribute and valid URL: 'https://statement-sender.preview.emergentagent.com/api/download/e6948f4db3c640f5af71b19fc73b4624', (6) NO new browser tabs opened (as intended), (7) User must manually click the download button to trigger download, (8) API call to /api/outlook/batch-create returns 200 status successfully, (9) Toast message confirms: 'Download started! Check your Downloads folder.', (10) Clear instructions provided: 'After downloading, extract the ZIP and double-click .eml files to open in Outlook', (11) 'Clear & Generate More' button available for additional generations. The NEW manual download button feature is working perfectly and provides excellent user experience with clear visual feedback and manual control over downloads."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
