@@ -491,6 +491,181 @@ async def create_report(report_content: str = Form(...), filename: str = Form(..
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Request model for batch processing
+class BatchDraftItem(BaseModel):
+    pdf_filename: str
+    recipient_email: str
+
+class BatchDraftRequest(BaseModel):
+    items: List[BatchDraftItem]
+    subject: str
+    body: str
+    sender_email: Optional[str] = None
+    sender_name: Optional[str] = None
+
+
+# NEW: Batch process multiple PDFs and return a single ZIP file
+@api_router.post("/outlook/batch-create")
+async def create_batch_drafts(
+    pdf_files: List[UploadFile] = File(...),
+    recipients: str = Form(...),  # JSON string of [{filename, email}]
+    subject: str = Form(...),
+    body: str = Form(...),
+    sender_email: str = Form(None),
+    sender_name: str = Form(None)
+):
+    """
+    Process multiple PDFs and return a single ZIP file containing all drafts and a report.
+    This avoids opening multiple browser tabs.
+    """
+    import json
+    
+    try:
+        recipient_map = json.loads(recipients)  # [{filename: "x.pdf", email: "a@b.com"}, ...]
+        
+        # Create a temporary directory for this batch
+        batch_id = uuid.uuid4().hex
+        batch_dir = os.path.join('/tmp', f"batch_{batch_id}")
+        os.makedirs(batch_dir, exist_ok=True)
+        
+        successful = []
+        failed = []
+        
+        # Process each PDF
+        for pdf_file in pdf_files:
+            # Find the recipient for this file
+            recipient_info = next(
+                (r for r in recipient_map if r['filename'] == pdf_file.filename),
+                None
+            )
+            
+            if not recipient_info:
+                failed.append({
+                    "filename": pdf_file.filename,
+                    "reason": "No recipient email found for this file"
+                })
+                continue
+            
+            recipient_email = recipient_info['email']
+            
+            try:
+                # Create the email message
+                msg = MIMEMultipart()
+                msg['To'] = recipient_email
+                msg['Subject'] = subject
+                
+                if sender_email:
+                    if sender_name:
+                        msg['From'] = f'"{sender_name}" <{sender_email}>'
+                    else:
+                        msg['From'] = sender_email
+                
+                msg['X-Unsent'] = '1'
+                msg['X-UnsentDraft'] = '1'
+                msg.attach(MIMEText(body, 'html'))
+                
+                # Read and attach PDF file
+                pdf_content = await pdf_file.read()
+                await pdf_file.seek(0)  # Reset for potential re-read
+                
+                part = MIMEBase('application', 'pdf')
+                part.set_payload(pdf_content)
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename={pdf_file.filename}')
+                msg.attach(part)
+                
+                # Save .eml file
+                eml_filename = f"draft_{pdf_file.filename.replace('.pdf', '')}.eml"
+                eml_path = os.path.join(batch_dir, eml_filename)
+                
+                with open(eml_path, 'w', encoding='utf-8') as eml_file:
+                    eml_file.write(msg.as_string())
+                
+                successful.append({
+                    "filename": pdf_file.filename,
+                    "recipient": recipient_email,
+                    "output": eml_filename
+                })
+                
+            except Exception as e:
+                failed.append({
+                    "filename": pdf_file.filename,
+                    "reason": str(e)
+                })
+        
+        # Generate the report
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        report_content = f"SPEEDY STATEMENTS - GENERATION REPORT\n"
+        report_content += f"Generated: {timestamp}\n"
+        report_content += f"{'=' * 50}\n\n"
+        
+        report_content += f"SUMMARY\n"
+        report_content += f"{'-' * 30}\n"
+        report_content += f"Total Processed: {len(successful) + len(failed)}\n"
+        report_content += f"Successful: {len(successful)}\n"
+        report_content += f"Failed: {len(failed)}\n\n"
+        
+        if successful:
+            report_content += f"SUCCESSFULLY GENERATED\n"
+            report_content += f"{'-' * 30}\n"
+            for i, item in enumerate(successful, 1):
+                report_content += f"{i}. {item['filename']}\n"
+                report_content += f"   Recipient: {item['recipient']}\n"
+                report_content += f"   Output: {item['output']}\n\n"
+        
+        if failed:
+            report_content += f"FAILED TO GENERATE\n"
+            report_content += f"{'-' * 30}\n"
+            for i, item in enumerate(failed, 1):
+                report_content += f"{i}. {item['filename']}\n"
+                report_content += f"   Reason: {item['reason']}\n\n"
+        
+        report_content += f"{'=' * 50}\n"
+        report_content += f"End of Report\n"
+        
+        # Save report to batch directory
+        report_filename = f"statement_report_{datetime.now().strftime('%Y-%m-%d')}.txt"
+        report_path = os.path.join(batch_dir, report_filename)
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(report_content)
+        
+        # Create ZIP file
+        zip_filename = f"speedy_statements_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+        zip_path = os.path.join('/tmp', zip_filename)
+        
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(batch_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = file  # Just the filename, no directory structure
+                    zipf.write(file_path, arcname)
+        
+        # Clean up batch directory
+        import shutil
+        shutil.rmtree(batch_dir, ignore_errors=True)
+        
+        # Store ZIP for download
+        generated_files[batch_id] = zip_path
+        
+        return JSONResponse({
+            "success": True,
+            "file_id": batch_id,
+            "filename": zip_filename,
+            "download_url": f"/api/download/{batch_id}",
+            "summary": {
+                "total": len(successful) + len(failed),
+                "successful": len(successful),
+                "failed": len(failed)
+            },
+            "successful": successful,
+            "failed": failed
+        })
+        
+    except Exception as e:
+        logging.error(f"Error in batch processing: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.get("/")
 async def root():
     return {"message": "Speedy Statements API"}
