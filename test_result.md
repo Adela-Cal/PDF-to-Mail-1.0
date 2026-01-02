@@ -192,11 +192,11 @@ frontend:
 
   - task: "Download .eml files in web preview"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -213,18 +213,24 @@ frontend:
       - working: false
         agent: "main"
         comment: "Added file-saver library for better browser compatibility. Also added report generation for failed statements."
+      - working: true
+        agent: "testing"
+        comment: "COMPREHENSIVE DOWNLOAD TESTING COMPLETED ✅ - Performed complete end-to-end testing with file-saver library: (1) Successfully uploaded test PDF with email address john.doe@testcompany.com, (2) Email extraction working perfectly, (3) Form filling and PDF selection successful, (4) Generate button clicked successfully, (5) .eml file download detected: 'draft_25b427ba_test_email_document.eml' via blob URL, (6) Download triggered successfully using file-saver library (saveAs function), (7) Console logs confirm successful download with no errors. The file-saver library implementation is working correctly and downloads are functioning properly in web preview."
 
   - task: "Generate failed statements report"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "main"
         comment: "NEW FEATURE: Added generateReport function that creates a text file listing all successful and failed statement generations. The report includes timestamp, summary stats, and detailed lists with reasons for failures."
+      - working: true
+        agent: "testing"
+        comment: "REPORT GENERATION TESTING COMPLETED ✅ - Successfully tested the new report generation feature: (1) Report file automatically generated after clicking Generate Drafts, (2) Downloaded report file: 'statement_report_2026-01-02.txt' via blob URL, (3) Report contains timestamp, summary stats (total processed, successful, failed), (4) Detailed lists of successful generations with recipient info, (5) Failed generations with reasons (if any), (6) Report download triggered successfully using file-saver library. The generateReport function is working perfectly and provides comprehensive reporting of statement generation results."
 
 metadata:
   created_by: "main_agent"
