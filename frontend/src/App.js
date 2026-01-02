@@ -433,7 +433,7 @@ function App() {
   };
 
   // Generate a report of successful and failed statement generations
-  const generateReport = (successful, failed) => {
+  const generateReport = async (successful, failed) => {
     const timestamp = new Date().toLocaleString();
     let reportContent = `SPEEDY STATEMENTS - GENERATION REPORT\n`;
     reportContent += `Generated: ${timestamp}\n`;
@@ -470,11 +470,26 @@ function App() {
     reportContent += `${'='.repeat(50)}\n`;
     reportContent += `End of Report\n`;
     
-    // Download the report as a text file
-    const reportBlob = new Blob([reportContent], { type: 'text/plain' });
     const reportFilename = `statement_report_${new Date().toISOString().slice(0, 10)}.txt`;
     
-    downloadFile(reportBlob, reportFilename);
+    try {
+      // Use the backend endpoint to create and serve the report
+      const formData = new FormData();
+      formData.append('report_content', reportContent);
+      formData.append('filename', reportFilename);
+      
+      const response = await axios.post(`${API}/report/create`, formData);
+      
+      if (response.data && response.data.success) {
+        // Open the download URL directly
+        window.open(`${BACKEND_URL}${response.data.download_url}`, '_blank');
+      }
+    } catch (error) {
+      console.error('Failed to create report via API, trying direct download:', error);
+      // Fallback to blob download
+      const reportBlob = new Blob([reportContent], { type: 'text/plain' });
+      saveAs(reportBlob, reportFilename);
+    }
   };
 
   return (
