@@ -255,11 +255,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Download .eml files in web preview"
-    - "Generate failed statements report"
+    - "NEW download mechanism using direct GET endpoints"
   stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
