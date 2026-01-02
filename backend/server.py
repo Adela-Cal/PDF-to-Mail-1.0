@@ -17,6 +17,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 import base64
 import io
+import zipfile
 from json_storage import JSONStorage, DatabaseWrapper
 
 
