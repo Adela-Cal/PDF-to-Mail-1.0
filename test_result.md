@@ -174,11 +174,11 @@ frontend:
 
   - task: "Email preview editor cursor jumping fix"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -186,14 +186,17 @@ frontend:
       - working: false
         agent: "main"
         comment: "Fixed by removing onInput handler and dangerouslySetInnerHTML that caused re-renders. Now using ref-based approach where content is only saved onBlur, and initial content is set via ref.innerHTML instead of controlled state"
+      - working: true
+        agent: "testing"
+        comment: "COMPREHENSIVE CURSOR TESTING COMPLETED ✅ - Performed extensive testing of email preview editor cursor behavior: (1) Typed at beginning, middle, and end positions - cursor remained stable, (2) Continuous typing test with 338 characters - no cursor jumping detected, (3) Blur/refocus test - content preserved and cursor behavior normal, (4) All typed content was properly saved and displayed. The cursor fix is working perfectly - no jumping to top-left corner observed during any test scenario."
 
   - task: "Download .eml files in web preview"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -201,6 +204,9 @@ frontend:
       - working: false
         agent: "main"
         comment: "Download mechanism uses blob URL and programmatic link click. Need to test if this works in web preview. Also added download handler for Electron standalone app."
+      - working: true
+        agent: "testing"
+        comment: "DOWNLOAD FUNCTIONALITY TESTING COMPLETED ✅ - Successfully tested .eml file download mechanism: (1) Generated draft email with PDF attachment, (2) Download triggered successfully via blob URL and programmatic link click, (3) Downloaded file 'draft_20644054_test_with_email.eml' (1816 bytes), (4) Verified .eml file format with proper headers (X-Unsent: 1, X-UnsentDraft: 1), (5) API requests to /api/outlook/draft-upload returned 200 OK. Download functionality is working correctly in web preview."
 
 metadata:
   created_by: "main_agent"
