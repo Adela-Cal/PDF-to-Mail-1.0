@@ -192,11 +192,11 @@ frontend:
 
   - task: "Download .eml files in web preview"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: false
         agent: "user"
@@ -207,6 +207,24 @@ frontend:
       - working: true
         agent: "testing"
         comment: "DOWNLOAD FUNCTIONALITY TESTING COMPLETED ✅ - Successfully tested .eml file download mechanism: (1) Generated draft email with PDF attachment, (2) Download triggered successfully via blob URL and programmatic link click, (3) Downloaded file 'draft_20644054_test_with_email.eml' (1816 bytes), (4) Verified .eml file format with proper headers (X-Unsent: 1, X-UnsentDraft: 1), (5) API requests to /api/outlook/draft-upload returned 200 OK. Download functionality is working correctly in web preview."
+      - working: false
+        agent: "user"
+        comment: "User still not seeing downloads in their browser. Downloads may be blocked."
+      - working: false
+        agent: "main"
+        comment: "Added file-saver library for better browser compatibility. Also added report generation for failed statements."
+
+  - task: "Generate failed statements report"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "NEW FEATURE: Added generateReport function that creates a text file listing all successful and failed statement generations. The report includes timestamp, summary stats, and detailed lists with reasons for failures."
 
 metadata:
   created_by: "main_agent"
