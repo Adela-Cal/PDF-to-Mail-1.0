@@ -282,7 +282,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "NEW batch download feature - single ZIP file with hidden iframe"
+    - "NEW manual download button feature - visible download button"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
