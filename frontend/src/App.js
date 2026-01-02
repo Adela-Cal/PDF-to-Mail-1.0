@@ -265,7 +265,10 @@ function App() {
       return;
     }
 
-    if (!emailSubject.trim() || !emailPreview.trim()) {
+    // Get the current content from the ref if available, otherwise use state
+    const currentPreviewContent = emailPreviewRef.current?.innerHTML || emailPreview || emailBody;
+    
+    if (!emailSubject.trim() || !currentPreviewContent.trim()) {
       toast.error("Please enter email subject and body");
       return;
     }
@@ -278,6 +281,8 @@ function App() {
     const senderEmail = account?.email || null;
     const senderName = account?.name || null;
     
+    // Use the current preview content
+    const finalEmailBody = currentPreviewContent;
     // Use the preview content (which may have been edited)
     const finalEmailBody = emailPreview || emailBody;
 
