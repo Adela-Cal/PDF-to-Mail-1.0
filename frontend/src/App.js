@@ -949,7 +949,7 @@ function App() {
         </div>
 
         {/* Generate Button */}
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex justify-center">
           <Button
             data-testid="generate-drafts-btn"
             onClick={handleGenerateDrafts}
@@ -960,54 +960,6 @@ function App() {
             <Download className="w-5 h-5 mr-2" />
             {loading ? "Processing..." : `Generate Outlook Drafts (${selectedPdfs.length})`}
           </Button>
-          
-          {/* Download Ready Section - Shows after generation */}
-          {downloadReady && (
-            <Card className="w-full max-w-2xl border-4 border-green-500 bg-green-50 shadow-2xl animate-pulse">
-              <CardContent className="p-8 text-center">
-                <div className="mb-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4">
-                    <Download className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-green-800 mb-2">
-                    ✅ Your Files Are Ready!
-                  </h3>
-                  <p className="text-green-700 mb-1">
-                    Generated {downloadReady.summary.successful} draft(s)
-                    {downloadReady.summary.failed > 0 && `, ${downloadReady.summary.failed} failed`}
-                  </p>
-                  <p className="text-sm text-green-600 mb-4">
-                    {downloadReady.filename}
-                  </p>
-                </div>
-                
-                <a
-                  href={downloadReady.url}
-                  download={downloadReady.filename}
-                  className="inline-flex items-center justify-center gap-3 px-10 py-5 text-xl font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-lg hover:shadow-xl transition-all"
-                  onClick={() => {
-                    toast.success("Download started! Check your Downloads folder.", { duration: 5000 });
-                  }}
-                >
-                  <Download className="w-6 h-6" />
-                  CLICK HERE TO DOWNLOAD ZIP FILE
-                </a>
-                
-                <p className="mt-4 text-sm text-green-600">
-                  After downloading, extract the ZIP and double-click .eml files to open in Outlook
-                </p>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 text-green-700 border-green-500 hover:bg-green-100"
-                  onClick={() => setDownloadReady(null)}
-                >
-                  Clear & Generate More
-                </Button>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
     </div>
