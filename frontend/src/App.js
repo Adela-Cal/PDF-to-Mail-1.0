@@ -329,11 +329,14 @@ function App() {
         });
         
         if (response.data && response.data.success) {
-          const { summary, download_url, filename } = response.data;
+          const { summary, file_data, filename } = response.data;
+          
+          // Create a data URL from the base64 data - this ALWAYS works
+          const dataUrl = `data:application/zip;base64,${file_data}`;
           
           // Set download ready state - show a clickable download button
           setDownloadReady({
-            url: `${BACKEND_URL}${download_url}`,
+            dataUrl: dataUrl,
             filename: filename,
             summary: summary
           });
