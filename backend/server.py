@@ -644,17 +644,14 @@ async def create_batch_drafts(
         import shutil
         shutil.rmtree(batch_dir, ignore_errors=True)
         
-        # Read the ZIP file and encode as base64 for direct download
-        with open(zip_path, 'rb') as f:
-            zip_data = base64.b64encode(f.read()).decode('utf-8')
-        
-        # Clean up ZIP file
-        os.remove(zip_path)
+        # Store ZIP for download via GET endpoint
+        generated_files[batch_id] = zip_path
         
         return JSONResponse({
             "success": True,
+            "file_id": batch_id,
             "filename": zip_filename,
-            "file_data": zip_data,  # Base64 encoded ZIP file
+            "download_url": f"/api/download/{batch_id}",
             "summary": {
                 "total": len(successful) + len(failed),
                 "successful": len(successful),
