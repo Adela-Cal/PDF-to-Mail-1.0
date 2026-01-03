@@ -278,6 +278,8 @@ function App() {
     }
 
     setLoading(true);
+    let successCount = 0;
+    let failedCount = 0;
     
     // Get selected email account details
     const account = emailAccounts.find(a => a.id === selectedAccount);
@@ -287,133 +289,109 @@ function App() {
     // Use the current preview content
     const finalEmailBody = currentPreviewContent;
 
-    try {
-      // Check if using uploaded files (web preview) or folder path (standalone app)
-      if (uploadedFiles.length > 0) {
-        // WEB PREVIEW: Use batch endpoint that returns a single ZIP file
-        const formData = new FormData();
+    toast.info(`Processing ${selectedPdfs.length} statement(s)...`, { duration: 3000 });
+
+    for (const pdfFilename of selectedPdfs) {
+      const pdf = pdfs.find(p => p.filename === pdfFilename);
+      if (!pdf || pdf.emails.length === 0) {
+        toast.warning(`No email found in ${pdfFilename}`);
+        failedCount++;
+        continue;
+      }
+
+      const recipientEmail = pdf.emails[0];
+
+      try {
+        let response;
         
-        // Build recipient mapping
-        const recipients = [];
-        
-        for (const pdfFilename of selectedPdfs) {
-          const pdf = pdfs.find(p => p.filename === pdfFilename);
+        // Check if using uploaded files or folder path
+        if (uploadedFiles.length > 0) {
           const file = uploadedFiles.find(f => f.name === pdfFilename);
-          
-          if (file && pdf && pdf.emails.length > 0) {
-            formData.append('pdf_files', file);
-            recipients.push({
-              filename: pdfFilename,
-              email: pdf.emails[0]
+          if (file) {
+            const formData = new FormData();
+            formData.append('pdf_file', file);
+            formData.append('recipient_email', recipientEmail);
+            formData.append('subject', emailSubject);
+            formData.append('body', finalEmailBody);
+            if (senderEmail) formData.append('sender_email', senderEmail);
+            if (senderName) formData.append('sender_name', senderName);
+
+            response = await axios.post(`${API}/outlook/draft-upload`, formData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              responseType: 'blob'
             });
           }
+        } else {
+          // Use folder path method
+          response = await axios.post(`${API}/outlook/draft`, {
+            pdf_filename: pdf.filename,
+            pdf_path: pdf.file_path,
+            recipient_email: recipientEmail,
+            sender_email: senderEmail,
+            sender_name: senderName,
+            subject: emailSubject,
+            body: finalEmailBody
+          }, {
+            responseType: 'blob'
+          });
         }
-        
-        if (recipients.length === 0) {
-          toast.error("No valid PDFs with email addresses found");
-          setLoading(false);
-          return;
-        }
-        
-        formData.append('recipients', JSON.stringify(recipients));
-        formData.append('subject', emailSubject);
-        formData.append('body', finalEmailBody);
-        if (senderEmail) formData.append('sender_email', senderEmail);
-        if (senderName) formData.append('sender_name', senderName);
-        
-        toast.info(`Processing ${recipients.length} statement(s)...`, { duration: 3000 });
-        
-        // Call the batch endpoint
-        const response = await axios.post(`${API}/outlook/batch-create`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        
-        if (response.data && response.data.success) {
-          const { summary, download_url, filename } = response.data;
+
+        if (response && response.data) {
+          // Get filename from response headers or create one
+          const contentDisposition = response.headers['content-disposition'];
+          let filename = `draft_${pdfFilename.replace('.pdf', '')}.eml`;
           
-          // Set download ready state with server URL
-          setDownloadReady({
-            url: `${BACKEND_URL}${download_url}`,
-            filename: filename,
-            summary: summary
+          if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (filenameMatch && filenameMatch[1]) {
+              filename = filenameMatch[1].replace(/['"]/g, '');
+            }
+          }
+          
+          // Create blob with correct MIME type - THIS IS THE ORIGINAL WORKING CODE
+          const blob = new Blob([response.data], { 
+            type: 'message/rfc822'
           });
           
-          // Show success message
-          if (summary.failed > 0) {
-            toast.success(`Generated ${summary.successful} draft(s), ${summary.failed} failed`, {
-              duration: 10000,
-              description: `Click the DOWNLOAD button below to get your ZIP file.`
-            });
-          } else {
-            toast.success(`Successfully generated ${summary.successful} draft email(s)!`, {
-              duration: 10000,
-              description: `Click the DOWNLOAD button below to get your ZIP file.`
-            });
-          }
-        } else {
-          toast.error("Server did not return a successful response");
-        }
-        
-      } else {
-        // STANDALONE APP: Process each file individually with blob download
-        let successCount = 0;
-        const failedStatements = [];
-        const successfulStatements = [];
-        
-        for (const pdfFilename of selectedPdfs) {
-          const pdf = pdfs.find(p => p.filename === pdfFilename);
-          if (!pdf || pdf.emails.length === 0) {
-            failedStatements.push({ filename: pdfFilename, reason: "No email found" });
-            continue;
-          }
+          // Create download link with better browser compatibility
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
           
-          try {
-            const response = await axios.post(`${API}/outlook/draft`, {
-              pdf_filename: pdf.filename,
-              pdf_path: pdf.file_path,
-              recipient_email: pdf.emails[0],
-              sender_email: senderEmail,
-              sender_name: senderName,
-              subject: emailSubject,
-              body: finalEmailBody
-            }, { responseType: 'blob' });
-            
-            if (response && response.data) {
-              const filename = `draft_${pdfFilename.replace('.pdf', '')}.eml`;
-              saveAs(new Blob([response.data]), filename);
-              successCount++;
-              successfulStatements.push({
-                filename: pdfFilename,
-                recipient: pdf.emails[0],
-                outputFile: filename
-              });
-            }
-          } catch (error) {
-            failedStatements.push({
-              filename: pdfFilename,
-              reason: error.message || "Unknown error"
-            });
-          }
+          // Force download by appending to body and clicking
+          document.body.appendChild(link);
+          link.click();
+          
+          // Cleanup after a short delay
+          setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          }, 250);
+          
+          successCount++;
+          console.log(`Successfully downloaded: ${filename}`);
         }
-        
-        // Generate report for standalone
-        if (successCount > 0 || failedStatements.length > 0) {
-          await generateReport(successfulStatements, failedStatements);
-        }
-        
-        if (successCount > 0) {
-          toast.success(`Generated ${successCount} draft email(s)!`);
-        } else {
-          toast.error("Failed to generate any drafts");
-        }
+      } catch (error) {
+        console.error(`Error generating draft for ${pdfFilename}:`, error);
+        toast.error(`Failed to generate draft for ${pdfFilename}`);
+        failedCount++;
       }
       
-    } catch (error) {
-      console.error('Error generating drafts:', error);
-      toast.error(error.response?.data?.detail || error.message || "Error generating drafts");
+      // Add delay between downloads to ensure browser processes each one
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
-    
+
     setLoading(false);
+    
+    if (successCount > 0) {
+      toast.success(`Generated ${successCount} draft email(s)!`, {
+        duration: 8000,
+        description: `Check your Downloads folder for .eml files.${failedCount > 0 ? ` (${failedCount} failed)` : ''}`
+      });
+    } else {
+      toast.error("Failed to generate any draft emails.");
+    }
   };
 
   // Helper function kept for standalone app compatibility
