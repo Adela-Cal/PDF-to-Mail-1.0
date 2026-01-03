@@ -1004,7 +1004,7 @@ function App() {
                 </div>
                 
                 <a
-                  href={downloadReady.dataUrl}
+                  href={downloadReady.url}
                   download={downloadReady.filename}
                   className="inline-flex items-center justify-center gap-3 px-10 py-5 text-xl font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-lg hover:shadow-xl transition-all"
                   onClick={() => {
